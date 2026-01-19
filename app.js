@@ -2254,6 +2254,57 @@ function updateRoleControls(roomData, players) {
   }
 }
 
+function escapeHtml(str = "") {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function renderQuestionText(rawText = "") {
+  // รองรับทั้ง \n และ \n\n และตัดบรรทัดว่าง
+  const lines = rawText
+    .split("\n")
+    .map(l => l.trim())
+    .filter(Boolean);
+
+  const pick = (prefix) => {
+    const line = lines.find(l => l.startsWith(prefix));
+    return line ? line.slice(prefix.length).trim() : "";
+  };
+
+  // ถ้าเป็นชุดคำถามเดิม (general/love/friends/money) จะไม่มี prefix
+  const hasFormat =
+    lines.some(l => l.startsWith("Question :")) ||
+    lines.some(l => l.startsWith("คำถาม :")) ||
+    lines.some(l => l.startsWith("Hint :")) ||
+    lines.some(l => l.startsWith("Database :"));
+
+  if (!hasFormat) {
+    // แสดงแบบเดิม แต่ยังเคารพขึ้นบรรทัดใหม่
+    // (อย่าลืม CSS: white-space: pre-line; ถ้าต้องการ)
+    return `<div class="value">${escapeHtml(rawText)}</div>`;
+  }
+
+  const qEn = pick("Question :");
+  const qTh = pick("คำถาม :");
+  const hint = pick("Hint :");
+  const db = pick("Database :");
+
+  return `
+    <span class="label">Question :</span>
+    <span class="value">${escapeHtml(qEn)}</span>
+
+    <span class="label">คำถาม :</span>
+    <span class="value">${escapeHtml(qTh)}</span>
+
+    <div class="meta">Hint : ${escapeHtml(hint)}</div>
+    <div class="meta">Database : ${escapeHtml(db)}</div>
+  `;
+}
+
 function updateQuestionUI(roomData, players) {
   const phase = roomData.phase || PHASE.IDLE;
   const round = roomData.currentRound || 0;
@@ -2261,9 +2312,6 @@ function updateQuestionUI(roomData, players) {
   const ui = roomData.ui || {};
   const keepOnEnd = phase === PHASE.ENDED && ui.keepQuestionOnEnd === true;
 
-  // เลือก "ข้อ" ที่จะโชว์:
-  // - ปกติ: ใช้ roomData.questionIndex
-  // - เกมจบและต้องค้าง: ใช้ ui.keepQuestionIndex (fallback ไป roomData.questionIndex)
   const questionIndex =
     keepOnEnd ? (ui.keepQuestionIndex ?? roomData.questionIndex) : roomData.questionIndex;
 
@@ -2281,21 +2329,18 @@ function updateQuestionUI(roomData, players) {
   }
 
   // =========================
-  // ✅ NEW: เกมจบแต่ต้องการ "ค้างหน้าเฉลย"
-  // + ✅ FIX: ถ้าผู้ใช้กดปิดไปแล้ว จะไม่เปิดเด้งกลับมา
+  // ✅ เกมจบแต่ต้องการ "ค้างหน้าเฉลย"
   // =========================
   if (keepOnEnd && question) {
     const showRound = ui.keepQuestionRound ?? round;
     const showQIndex = ui.keepQuestionIndex ?? roomData.questionIndex;
 
-    // สร้าง key เพื่อรีเซ็ต dismissed เมื่อเป็นคนละรอบ/คนละข้อ/คนละห้อง
     const nextKey = `${currentRoomCode || "-"}|${showRound}|${showQIndex}`;
     if (endQuestionKey !== nextKey) {
       endQuestionKey = nextKey;
-      endQuestionDismissed = false; // เปลี่ยนเฉลยที่ค้าง -> ให้แสดงได้ใหม่
+      endQuestionDismissed = false;
     }
 
-    // ถ้าผู้ใช้ปิดแล้ว ให้ค้างเป็น "ปิด" ไม่เด้งกลับ
     if (endQuestionDismissed) {
       if (questionAreaOverlayEl) questionAreaOverlayEl.style.display = "none";
       if (closeQuestionAreaBtn) closeQuestionAreaBtn.style.display = "none";
@@ -2303,13 +2348,13 @@ function updateQuestionUI(roomData, players) {
       return;
     }
 
-    // แสดง overlay ค้างเฉลย
     if (questionAreaOverlayEl) questionAreaOverlayEl.style.display = "flex";
-    if (questionTextEl) questionTextEl.textContent = question.text;
+
+    // ✅ เปลี่ยนเป็น renderQuestionText + innerHTML
+    if (questionTextEl) questionTextEl.innerHTML = renderQuestionText(question.text);
 
     if (countdownDisplayEl) countdownDisplayEl.textContent = `เฉลยรอบที่ ${showRound}:`;
 
-    // ดึง selectedOption ของตัวเองให้แม่นขึ้นจาก history (เผื่อ player ถูก remove แล้ว players ไม่มี)
     let selectedOption = null;
     if (currentPlayerId) {
       const hk = `round_${showRound}`;
@@ -2321,7 +2366,6 @@ function updateQuestionUI(roomData, players) {
 
     renderChoicesForPhase(question, selectedOption, question.correctOption, true, true);
 
-    // ให้ปิดได้ (local)
     if (closeQuestionAreaBtn) closeQuestionAreaBtn.style.display = "inline-flex";
 
     clearTimer();
@@ -2331,7 +2375,10 @@ function updateQuestionUI(roomData, players) {
   // เดิม: ตอนนับถอยหลัง ใช้ countdown overlay แทน question area
   if (phase === PHASE.QUESTION_COUNTDOWN) {
     if (questionAreaOverlayEl) questionAreaOverlayEl.style.display = "none";
-    if (questionTextEl) questionTextEl.textContent = "";
+
+    // เคลียร์เป็น innerHTML ด้วย (กันค้าง HTML)
+    if (questionTextEl) questionTextEl.innerHTML = "";
+
     if (choicesContainerEl) choicesContainerEl.innerHTML = "";
     if (closeQuestionAreaBtn) closeQuestionAreaBtn.style.display = "none";
     ensureTimer(roomData, PHASE.QUESTION_COUNTDOWN);
@@ -2342,9 +2389,10 @@ function updateQuestionUI(roomData, players) {
   if (phase === PHASE.ANSWERING && question) {
     const shouldShow = !(currentRole === "host" && hostQuestionOverlayHidden);
     if (questionAreaOverlayEl) questionAreaOverlayEl.style.display = shouldShow ? "flex" : "none";
-    if (questionTextEl) questionTextEl.textContent = question.text;
 
-    // ซ่อนปุ่ม close เมื่อกำลังตอบ
+    // ✅ เปลี่ยนเป็น renderQuestionText + innerHTML
+    if (questionTextEl) questionTextEl.innerHTML = renderQuestionText(question.text);
+
     if (closeQuestionAreaBtn) closeQuestionAreaBtn.style.display = "none";
 
     const me = players?.[currentPlayerId] || {};
@@ -2353,7 +2401,6 @@ function updateQuestionUI(roomData, players) {
     const startAt = roomData.answerStartAt;
     const duration = roomData.answerTimeSeconds;
 
-    // fallback: answering แต่ยังไม่มีเวลาเริ่ม
     if (!Number.isFinite(startAt)) {
       if (countdownDisplayEl) countdownDisplayEl.textContent = "กำลังซิงค์เวลาเริ่ม…";
       if (currentRoomCode) moveCountdownToAnsweringTx().catch(() => {});
@@ -2376,7 +2423,10 @@ function updateQuestionUI(roomData, players) {
   // เดิม: หลังเฉลย
   if (phase === PHASE.RESULT && question) {
     if (questionAreaOverlayEl) questionAreaOverlayEl.style.display = "flex";
-    if (questionTextEl) questionTextEl.textContent = question.text;
+
+    // ✅ เปลี่ยนเป็น renderQuestionText + innerHTML
+    if (questionTextEl) questionTextEl.innerHTML = renderQuestionText(question.text);
+
     if (countdownDisplayEl) countdownDisplayEl.textContent = `เฉลยรอบที่ ${round}:`;
 
     let selectedOption = null;
@@ -2387,7 +2437,6 @@ function updateQuestionUI(roomData, players) {
 
     renderChoicesForPhase(question, selectedOption, question.correctOption, true, true);
 
-    // แสดงปุ่ม close เมื่อ RESULT
     if (closeQuestionAreaBtn) closeQuestionAreaBtn.style.display = "inline-flex";
 
     clearTimer();
