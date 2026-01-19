@@ -767,11 +767,30 @@ body.in-game #startGameBtn{
   margin-bottom: 6px;
 }
 #questionText{
-  font-weight: 900;
   color: var(--p-800);
   margin-bottom: 10px;
-  white-space: pre-line; /* ทำให้ \n ขึ้นบรรทัดใหม่ */
+  font-weight: 400;     /* <- ให้ทั้งก้อนบางก่อน */
+  line-height: 1.6;
 }
+
+#questionText .label{
+  font-weight: 900;
+  display: block;
+  margin-top: 6px;
+}
+
+#questionText .value{
+  font-weight: 400;
+  display: block;
+  margin-bottom: 10px; /* เว้นบรรทัดเพิ่ม */
+}
+
+#questionText .meta{
+  font-weight: 400;
+  display: block;
+  margin-top: 4px;
+}
+
 #choicesContainer{
   display: grid;
   gap: 8px;
