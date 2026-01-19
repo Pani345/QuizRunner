@@ -770,6 +770,7 @@ body.in-game #startGameBtn{
   font-weight: 900;
   color: var(--p-800);
   margin-bottom: 10px;
+  white-space: pre-line; /* ทำให้ \n ขึ้นบรรทัดใหม่ */
 }
 #choicesContainer{
   display: grid;
