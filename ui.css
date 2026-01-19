@@ -1,0 +1,1200 @@
+/* ui.css — Purple Library Theme (refactored)
+   Goals:
+   - Single source of truth per component
+   - Remove duplicate overlay/overlay-card blocks
+   - Keep final BOARD GRID layout as the only truth
+   - Remove/neutralize legacy selectors that are no longer used by current index.html/app.js
+   - Preserve existing look & behavior (no game logic changes)
+*/
+
+/* =========================
+   1) TOKENS / THEME
+   ========================= */
+:root{
+  --p-900:#2f2a66;
+  --p-800:#3a3178;
+  --p-700:#463a86;
+  --p-600:#4B3C8C;
+  --p-550:#FFA240;
+  --p-500:#5a4bb0;
+  --p-100:#EDE9F7;
+  --p-050:#F6F4FB;
+
+  --bg:#f6f6fb;
+  --card:#ffffff;
+  --text:#1f2330;
+  --muted:#6b6f7c;
+  --line:#e3e3ee;
+
+  --shadow: 0 8px 22px rgba(31, 35, 48, .08);
+  --shadow2: 0 10px 28px rgba(31, 35, 48, .12);
+  --radius: 14px;
+  --radius-sm: 10px;
+
+  --lobby-chip-h: 28px; /* height of badge/buttons in bars */
+
+  /* Board sizing (single source of truth) */
+  --track-gap: 4px;
+  --cell-h: 20px;
+  --start-w: 190px;
+  --finish-w: 88px;
+  /* Player List*/
+  --name-col-ch: 16ch;
+  /* Dice */
+  --dice-size: 150px;
+  --roll-dice-size: 210px;
+  --dice-half: calc(var(--dice-size) / 2);
+  --pip: 14px;
+  --pip-color: #1f2330;
+}
+
+/* =========================
+   2) BASE / RESET
+   ========================= */
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans Thai", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+button, input, select, textarea { font: inherit; }
+
+/* Accessibility: prefer reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *{
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =========================
+   3) HEADER
+   ========================= */
+.app-header{
+  background: linear-gradient(90deg, var(--p-600), var(--p-800));
+  color:#fff;
+  padding: 8px 8px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 6px 18px rgba(0,0,0,.12);
+}
+.header-inner{
+  max-width: 1060px;
+  margin: 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+}
+.brand{ display:flex; align-items:center; gap: 10px; }
+.brand-title{ display:flex; flex-direction:column; line-height:1.05; }
+.brand-title strong{ font-size: 16px; }
+.brand-title span{ font-size: 12px; opacity:.9; }
+
+.header-meta{
+  display:flex;
+  gap: 10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.pill{
+  background: rgba(255,255,255,.16);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* Brand badge (QR) */
+.brand-badge.badge-v1{
+  width: 88px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 6px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.brand-badge.badge-v1::before{
+  content:"";
+  position:absolute;
+  inset: 6px;
+  background:
+    conic-gradient(from 90deg,
+      var(--p-600) 0 25%, #cfcfd9 0 50%, var(--p-600) 0 75%, #cfcfd9 0 100%);
+  background-size: 12px 12px;
+  clip-path: polygon(14% 0%, 100% 0%, 86% 100%, 0% 100%);
+  filter: drop-shadow(0 8px 14px rgba(0,0,0,.22));
+}
+.brand-badge.badge-v1::after{
+  content:"";
+  position:absolute;
+  inset: 6px;
+  clip-path: polygon(14% 0%, 100% 0%, 86% 100%, 0% 100%);
+  background:
+    radial-gradient(120% 120% at 22% 30%, rgba(255,255,255,.20), transparent 55%),
+    radial-gradient(120% 120% at 78% 72%, rgba(0,0,0,.18), transparent 60%),
+    linear-gradient(90deg, rgba(255,255,255,.10), rgba(0,0,0,.10));
+  mix-blend-mode: overlay;
+  opacity: .9;
+  pointer-events: none;
+}
+.brand-badge.badge-v1 .badge-text{
+  position: relative;
+  z-index: 2;
+  font-weight: 1000;
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: .6px;
+  color: #FFA240;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-shadow: 0 6px 14px rgba(0,0,0,.22);
+  -webkit-text-stroke: 0 transparent !important;
+}
+
+/* =========================
+   4) LAYOUT / CONTAINER / GRID
+   ========================= */
+.container{
+  max-width: 1060px;
+  margin: 18px auto 28px;
+  padding: 0 14px;
+}
+.grid-2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 900px){
+  .grid-2{ grid-template-columns: 1fr; }
+}
+
+/* Section title */
+.section-title{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  margin: 18px 0 10px;
+  color: var(--p-800);
+  font-weight: 900;
+  letter-spacing: .2px;
+}
+.section-title::before{
+  content:"";
+  width: 8px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--p-600);
+}
+
+/* =========================
+   5) CARDS / FORMS / BUTTONS
+   ========================= */
+.card{
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px;
+}
+.card h2, .card h3{
+  margin: 0 0 10px;
+  color: var(--p-800);
+}
+.card p{ color: var(--muted); }
+
+/* Form */
+label{
+  display:block;
+  font-weight: 700;
+  color: var(--p-800);
+  margin: 10px 0 6px;
+  font-size: 13px;
+}
+input, select{
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  outline: none;
+  background: #fff;
+  font-size: 14px;
+}
+input:focus, select:focus{
+  border-color: rgba(75,60,140,.65);
+  box-shadow: 0 0 0 4px rgba(75,60,140,.12);
+}
+button:focus-visible, input:focus-visible, select:focus-visible{
+  outline: 3px solid rgba(75,60,140,.28);
+  outline-offset: 2px;
+}
+
+/* Buttons */
+button{
+  border: none;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-weight: 800;
+  cursor:pointer;
+  transition: transform .06s ease, box-shadow .12s ease, opacity .12s ease;
+}
+button:active{ transform: translateY(1px); }
+
+.btn-primary{
+  background: var(--p-600);
+  color: #fff;
+  box-shadow: 0 10px 18px rgba(75,60,140,.22);
+}
+.btn-primary:hover{ box-shadow: 0 14px 24px rgba(75,60,140,.28); }
+
+.btn-ghost{
+  background: var(--p-100);
+  color: var(--p-800);
+  border: 1px solid rgba(75,60,140,.20);
+}
+.btn-ghost:hover{
+  box-shadow: 0 10px 18px rgba(75,60,140,.12);
+  transform: translateY(-1px);
+}
+
+button:disabled{
+  opacity: .55;
+  cursor: not-allowed;
+  box-shadow:none;
+}
+
+/* =========================
+   6) HOST OPTIONS PANEL (no jump)
+   ========================= */
+#createRoomBtn{ margin-top: 12px; }
+.card.lock-height{ overflow: hidden; }
+
+/* Use height/opacity to hide/show, while allowing JS to toggle class .is-open */
+#hostGameOptions{
+  display: block !important;     /* keep layout reserved even if inline display:none existed */
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: max-height .25s ease, opacity .2s ease, transform .2s ease;
+}
+#hostGameOptions.is-open{
+  max-height: 520px;             /* adjust if panel grows */
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Dotted split */
+.card-split{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 900px){
+  .card-split{ grid-template-columns: 1fr; }
+}
+.split-col{ padding: 4px 2px; }
+.split-col + .split-col{
+  border-left: 2px dotted rgba(75,60,140,.25);
+  padding-left: 14px;
+}
+@media (max-width: 900px){
+  .split-col + .split-col{
+    border-left: none;
+    border-top: 2px dotted rgba(75,60,140,.25);
+    padding-left: 2px;
+    padding-top: 14px;
+  }
+}
+
+/* =========================
+   7) ENTRY LANDING
+   ========================= */
+.entry-landing{
+  min-height: calc(100vh - 88px);
+  display: grid;
+  place-items: center;
+}
+.entry-landing-inner{
+  width: 100%;
+  text-align: center;
+}
+.entry-title{
+  margin: 0 0 6px;
+}
+.entry-sub{
+  margin: 0 0 14px;
+}
+.entry-join-btn{
+  width: min(520px, 92vw);
+  height: 78px;
+  font-size: 24px;
+  border-radius: 18px;
+}
+
+/* =========================
+   8) LOBBY / GAME BAR (single source of truth)
+   ========================= */
+.lobby-bar{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  margin-bottom: 4px;
+  flex-wrap: nowrap;   /* do not wrap */
+}
+.lobby-bar .section-title{
+  margin: 0 !important;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* badges: no wrap; scroll-x */
+.lobby-badges{
+  flex: 1 1 auto;
+  min-width: 0;
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.lobby-badges::-webkit-scrollbar{ display:none; }
+
+.lobby-badge{
+  height: var(--lobby-chip-h);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  line-height: 1;
+  font-size: 12px;
+  font-weight: 900;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--p-800);
+  box-shadow: 0 6px 14px rgba(31,35,48,.08);
+}
+
+/* actions: right side always single line */
+.lobby-actions{
+  flex: 0 0 auto;
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+.lobby-actions button{
+  height: var(--lobby-chip-h);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: none;
+}
+
+/* Lobby card head */
+.lobby-card-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.role-line{
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 520px){
+  .lobby-card-head{ flex-wrap: wrap; }
+  .role-line{ flex: 1 1 100%; }
+}
+
+/* List head row */
+.lobby-list-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+  margin: 2px 0 8px;
+}
+.lobby-list-title{
+  color: var(--p-800);
+  font-weight: 900;
+  white-space: nowrap;
+}
+.lobby-list-actions button,
+.lobby-list-actions #startGameBtn{
+  height: var(--lobby-chip-h, 28px) !important;
+  padding: 0 12px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+}
+
+/* Round/phase pills in game bar */
+#roundInfo{
+  white-space: nowrap;
+  font-weight: 900;
+}
+#phaseInfo{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ================================
+   IN-GAME LAYOUT SWITCH
+   - before start: nothing changes
+   - after start: gameBar+gameArea goes top, lobby bar hidden,
+     lobby-card moved under gameArea and hides its head sections
+   ================================ */
+
+/* ช่วงเริ่มเกมแล้ว: ซ่อนทั้ง #lobby (เพราะเราจะย้าย lobby-card ออกมาไว้ #lobbyCardHost) */
+body.in-game #lobby{
+  display: none !important;
+}
+
+/* โชว์ slot วาง lobby-card ใต้ gameArea */
+body.in-game #lobbyCardHost{
+  display: block !important;
+  margin-top: 14px;
+}
+
+/* ใน lobby-card: ซ่อนหัวส่วนบน + ซ่อนหัวรายชื่อ + ปุ่มเริ่มเล่น (อยู่ในหัวนั้น) */
+body.in-game .lobby-card-head,
+body.in-game .lobby-list-head{
+  display: none !important;
+}
+
+/* กันพลาด: ถ้ามีปุ่มเริ่มเล่นหลงเหลือ ให้ซ่อนไว้อีกชั้น */
+body.in-game #startGameBtn{
+  display: none !important;
+}
+
+/* =========================
+   9) TABLES (playerList + endGameSummary) — CLEAN + MERGED
+   ========================= */
+
+/* ---- wrappers (scroll container) ---- */
+#playerList,
+#endGameSummary{
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* playerList wrapper: ให้เลื่อนในแนวตั้งได้ถ้าผู้เล่นเยอะ */
+#playerList{
+  padding: 0 !important;
+  margin: 0 !important;
+  max-height: 52vh;
+  overflow: auto; /* x+y */
+}
+
+/* ---- base table ---- */
+#playerList table,
+#endGameSummary table{
+  width: 100%;
+  margin: 0 !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  table-layout: fixed;
+
+  /* keep readable on mobile: allow horizontal scroll */
+  min-width: max-content;
+}
+
+@media (max-width: 520px){
+  #playerList table,
+  #endGameSummary table{
+    min-width: 560px;
+  }
+}
+
+/* ---- shared cell style (header + body) ---- */
+:root{
+  --tbl-font: 16px;     /* ปรับขนาดตัวอักษรหลักที่นี่ */
+  --tbl-row-h: 22px;    /* ความสูงแถวที่ต้องการ */
+  --tbl-pad-x: 4px;     /* padding ซ้าย/ขวา */
+}
+
+#playerList th, #playerList td,
+#endGameSummary th, #endGameSummary td{
+  border: 1px solid var(--line);
+  padding: 0 var(--tbl-pad-x);
+  height: var(--tbl-row-h);
+  line-height: var(--tbl-row-h);
+  text-align: center;
+  vertical-align: middle;
+
+  font-size: var(--tbl-font);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* header look */
+#playerList th,
+#endGameSummary th{
+  background: var(--p-100);
+  color: var(--p-800);
+  font-weight: 900;
+}
+
+/* name column shared */
+#playerList th.name-col, #playerList td.name-col,
+#endGameSummary th.name-col, #endGameSummary td.name-col{
+  width: var(--name-col-ch);
+  max-width: var(--name-col-ch);
+}
+
+/* name cell weight (ตาม PATCH เดิม) */
+#playerList td.name-col, #endGameSummary td.name-col{
+  font-weight: 800;
+}
+
+/* =========================
+   PlayerList: 8 columns
+   ========================= */
+
+/* 1) # */
+#playerList th:nth-child(1),
+#playerList td:nth-child(1){ width: 3ch; }
+
+/* 3) ตำแหน่ง */
+#playerList th:nth-child(3),
+#playerList td:nth-child(3){ width: 6ch; }
+
+/* 4) ทอยแล้ว */
+#playerList th:nth-child(4),
+#playerList td:nth-child(4){ width: 7ch; }
+
+/* 5) ตอบแล้ว */
+#playerList th:nth-child(5),
+#playerList td:nth-child(5){ width: 7ch; }
+
+/* 6-7) ผลทอย + ผลคำตอบ ให้กว้างเท่ากัน */
+#playerList th:nth-child(6),
+#playerList td:nth-child(6),
+#playerList th:nth-child(7),
+#playerList td:nth-child(7){
+  width: 16ch;
+}
+
+/* 8) สถานะผู้เล่น */
+#playerList th:nth-child(8),
+#playerList td:nth-child(8){
+  width: 9ch;
+}
+
+/* =========================
+   EndGameSummary: 12 columns
+   ========================= */
+
+/* 1) อันดับ */
+#endGameSummary th:nth-child(1),
+#endGameSummary td:nth-child(1){ width: 3ch; }
+
+/* 3) ตำแหน่ง */
+#endGameSummary th:nth-child(3),
+#endGameSummary td:nth-child(3){ width: 5ch; }
+
+/* 4) เข้าเส้นชัย? */
+#endGameSummary th:nth-child(4),
+#endGameSummary td:nth-child(4){ width: 7ch; }
+
+/* 5) รอบที่เข้า */
+#endGameSummary th:nth-child(5),
+#endGameSummary td:nth-child(5){ width: 5ch; }
+
+/* 6) วิธีเข้า */
+#endGameSummary th:nth-child(6),
+#endGameSummary td:nth-child(6){ width: 5ch; }
+
+/* 7-8) ทอยลูกเต๋า + ผลคำถาม */
+#endGameSummary th:nth-child(7),
+#endGameSummary td:nth-child(7),
+#endGameSummary th:nth-child(8),
+#endGameSummary td:nth-child(8){
+  width: 15ch;
+}
+
+/* =========================
+   Dice glyph column (ผลทอย) — ใหญ่ขึ้น แต่แถวยังคุมด้วย row-h
+   ใช้ span ภายใน cell จะคุมตำแหน่งได้ดีที่สุด
+   ========================= */
+
+/* td ผลทอย: ตัด line-height ของ td ไม่ให้บังคับ glyph */
+#playerList td.rolls-col,
+#endGameSummary td.rolls-col{
+  line-height: var(--tbl-row-h); /* คง row-h */
+}
+
+/* ตัว glyph ภายใน (แนะนำให้คุณ render เป็น <span class="rolls-text">...</span>) */
+#playerList td.rolls-col .rolls-text,
+#endGameSummary td.rolls-col .rolls-text{
+  display: inline-block;
+  font-size: 24px;      /* dice ใหญ่ */
+  line-height: 1;       /* ลดช่องว่างบน/ล่างของ line box */
+  letter-spacing: 1px;
+  transform: translateY(-1px); /* ปรับจูนตำแหน่ง (อยากดันเพิ่มค่อยเพิ่ม) */
+}
+
+/* Rounded corners */
+#playerList thead tr th:first-child,
+#endGameSummary thead tr th:first-child{ border-top-left-radius: var(--radius-sm); }
+#playerList thead tr th:last-child,
+#endGameSummary thead tr th:last-child{ border-top-right-radius: var(--radius-sm); }
+#playerList tbody tr:last-child td:first-child,
+#endGameSummary tbody tr:last-child td:first-child{ border-bottom-left-radius: var(--radius-sm); }
+#playerList tbody tr:last-child td:last-child,
+#endGameSummary tbody tr:last-child td:last-child{ border-bottom-right-radius: var(--radius-sm); }
+
+/* =========================
+   10) GAME AREA / QUESTION AREA
+   ========================= */
+#gameArea{ margin-top: 0 !important; }
+
+/* Question Area Overlay */
+#questionAreaOverlay.overlay{
+  z-index: 9998;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* สำคัญ: ให้ปุ่มที่ absolute อ้างอิงตำแหน่งได้ */
+  position: fixed;
+
+  /* เผื่อพื้นที่ด้านล่างสำหรับปุ่ม (ประมาณ 14px + ความสูงปุ่ม) */
+  padding-bottom: 72px;
+
+  /* ไม่ต้องใช้ column แล้ว */
+  flex-direction: row;
+}
+
+/* ให้ 3 ปุ่มนี้ลอยเหนือ overlay */
+#startQuestionBtn,
+#revealAnswerBtn,
+#toggleQuestionOverlayBtn{
+  position: relative;
+  z-index: 10050; /* มากกว่า #questionAreaOverlay (9998) */
+}
+
+/* ส่วน startRoundBtn ไม่ต้องตั้ง z-index → จะโดน overlay ตามปกติ */
+#startRoundBtn{
+  position: relative; /* จะมีหรือไม่มีก็ได้ */
+  z-index: auto;
+}
+
+/* ให้ card อยู่กลางจอจริง ๆ */
+#questionAreaOverlay.overlay #questionArea{
+  pointer-events: auto;
+  margin: 0;
+}
+
+/* วางปุ่มไว้ใต้ card โดยไม่ไปดึงจุดกึ่งกลางของ card */
+#questionAreaOverlay.overlay #closeQuestionAreaBtn{
+  pointer-events: auto;
+
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  /* ระยะใต้ card */
+  top: calc(50% + (min(36vh, 288px) / 2) + 14px);
+
+  background: var(--p-550) !important;
+  border-color: var(--p-550) !important;
+  color: #fff;
+}
+
+#questionAreaOverlay.overlay #closeQuestionAreaBtn:hover{
+  background: var(--p-550) !important;
+  border-color: var(--p-550) !important;
+  opacity: 0.9;
+}
+
+#questionArea.card{
+  background: var(--card);
+  max-width: min(600px, 92vw);
+  max-height: min(80vh, 600px);
+  overflow: auto;
+  margin: 0;
+}
+
+/* Question Countdown Overlay */
+.question-countdown-number{
+  font-size: 320px;
+  font-weight: 900;
+  color: var(--p-800);
+  line-height: 1;
+  user-select: none;
+  z-index: 10000;
+  position: relative;
+}
+
+#countdownDisplay{
+  font-weight: 900;
+  color: var(--p-800);
+  margin-bottom: 6px;
+}
+#questionText{
+  font-weight: 900;
+  color: var(--p-800);
+  margin-bottom: 10px;
+}
+#choicesContainer{
+  display: grid;
+  gap: 8px;
+}
+
+/* Choice buttons */
+.choice-btn{
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--text);
+  padding: 10px 12px;
+  font-weight: 800;
+  text-align: left;
+}
+.choice-btn.selected{
+  background: var(--p-600);
+  color:#fff;
+  border-color: rgba(0,0,0,0);
+}
+.choice-btn.correct{ background:#2e7d32; color:#fff; }
+.choice-btn.wrong{ background:#c62828; color:#fff; }
+
+/* =========================
+   11) BOARD (GRID ONLY — single source of truth)
+========================= */
+
+/* Board container scroll */
+#board{
+  width: 100%;
+  margin-top: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+}
+
+/* Rows */
+.board-label-row,
+.player-row{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  width: 100%;
+}
+
+/* Track = grid (Start + 30 cells + Finish) */
+.board-track{
+  display: grid !important;
+  grid-template-columns: var(--start-w) repeat(30, var(--cell-h)) var(--finish-w);
+  column-gap: var(--track-gap);
+  align-items: center;
+  width: max-content;
+  min-width: 100%;
+}
+
+/* Base cell (all cells) */
+.cell-card{
+  position: relative;
+  overflow: visible;
+  border-radius: 4px;
+  box-sizing: border-box;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.18);
+}
+
+/* Common sizing for all cells in track */
+.board-track .cell-card{
+  height: var(--cell-h) !important;
+  min-width: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Play cells (1..30) */
+.cell-card.play-cell{
+  background: #fff;
+  padding: 0 !important;
+  line-height: 1 !important;
+  flex: none !important;
+}
+.cell-card.play-cell.cell-dice{ background:#64b5f6 !important; }
+.cell-card.play-cell.cell-correct{ background:#66bb6a !important; }
+.cell-card.play-cell.cell-wrong{ background:#ef5350 !important; }
+.cell-card.play-cell.cell-past{ background:#9e9e9e !important; }
+
+/* Start/Finish cells (default) */
+.start-cell{
+  width: var(--start-w) !important;
+  background: #fff;
+  border-right: 3px solid var(--p-600) !important;
+  font-weight: 900;
+  color: var(--p-800);
+  padding: 0 10px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* center text per your latest requirement */
+  justify-content: center !important;
+  text-align: center;
+}
+
+.finish-cell{
+  width: var(--finish-w) !important;
+  background: #fff;
+  border-left: 3px solid var(--p-800) !important;
+}
+
+/* Cell label (numbers / Start label row text) */
+.cell-label{
+  font-size: 14px;
+  color: var(--p-800);
+  font-weight: 900;
+}
+
+/* Label row: all cell-cards = p-100 */
+.board-label-row .cell-card{
+  background: var(--p-100) !important;
+}
+
+/* Start label centering (if inside span.cell-label) */
+.board-label-row .start-cell .cell-label{
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
+}
+
+/* Finish label font size in board-label-row */
+.board-label-row .finish-cell .cell-label{
+  font-size: 16px;
+}
+
+/* =========================
+   Highlight my track (player only)
+========================= */
+
+/* START cell highlight */
+.player-row.is-me .start-cell{
+  background: var(--p-800) !important;
+  color: #fff !important;
+  border-right: 3px solid var(--p-550) !important;
+}
+
+/* FINISH cell highlight */
+.player-row.is-me .finish-cell{
+  background: var(--p-800) !important;
+  color: #fff !important;
+  border-left: 3px solid var(--p-550) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ensure inner elements become white */
+.player-row.is-me .start-cell *,
+.player-row.is-me .finish-cell *{
+  color: #fff !important;
+}
+
+/* Token (droplet) */
+.token{
+  position:absolute;
+  width: 22px;
+  height: 22px;
+  background:#ffb300;
+  border-radius: 50% 50% 50% 0;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index: 2;
+  left: 50%;
+  top: 0;
+  transform-origin: 50% 50%;
+  transform: translate(-50%, -40%) rotate(-45deg);
+}
+.token-inner{
+  width: 12px;
+  height: 12px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: 9px;
+  font-weight: 900;
+  color:#333;
+  transform: rotate(45deg);
+}
+
+/* =========================
+   12) OVERLAYS (Admin + Dice) — unified (no duplicates)
+   ========================= */
+.overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(20, 18, 40, .42);
+  backdrop-filter: blur(6px);
+}
+@media (prefers-reduced-motion: reduce){
+  .overlay{ backdrop-filter: none; }
+}
+
+/* Dice Container (ไม่มี overlay-card แล้ว) */
+#diceOverlay{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  pointer-events: none; /* ให้ overlay ไม่บล็อกการคลิก */
+  flex-direction: column;
+  gap: 14px;
+}
+
+#diceOverlay .dice-scene,
+#diceOverlay #rollDiceBtn,
+#diceOverlay #closeDiceOverlayBtn,
+#diceOverlay #diceHint{
+  pointer-events: auto; /* ให้ dice-scene และปุ่มยังคลิกได้ */
+}
+
+.overlay-card{
+  width: 420px;
+  height: 340px;
+  max-width: min(420px, 92vw);
+  max-height: min(340px, 92vh);
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow2);
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+.overlay-title{
+  font-weight: 900;
+  color: var(--p-800);
+  margin-bottom: 12px;
+}
+.overlay-hint{
+  margin-top: 12px;
+  color: var(--muted);
+  font-weight: 800;
+}
+/* rollDiceBtn: transparent, no text, positioned over dice, same size as dice */
+#diceOverlay #rollDiceBtn{
+  position: absolute;
+  width: var(--roll-dice-size);
+  height: var(--roll-dice-size);
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-indent: -9999px;
+  overflow: hidden;
+  z-index: 10;
+  /* Center over dice */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#diceOverlay #rollDiceBtn:disabled{
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Dice Roll Hint: Pulsing ring with dotted accent */
+#diceRollHint{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 260px; /* ~13% larger than dice (150px) */
+  height: 260px;
+  pointer-events: none; /* Don't block clicks on dice */
+  z-index: 5; /* Behind rollDiceBtn (z-index: 10) but above dice */
+  display: none;
+}
+
+#diceRollHint.show{
+  display: block !important;
+}
+
+.dice-roll-hint-ring{
+  position: absolute;
+  inset: 0;
+  border: 3px solid var(--p-600);
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: dice-hint-pulse 2s ease-in-out infinite;
+}
+
+.dice-roll-hint-dots{
+  position: absolute;
+  inset: -8px;
+  border: 2px dashed var(--p-600);
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: dice-hint-pulse 2s ease-in-out infinite 0.3s;
+}
+
+@keyframes dice-hint-pulse{
+  0%, 100%{
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50%{
+    transform: scale(1.1);
+    opacity: 0.3;
+  }
+}
+
+/* Reduce animation for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .dice-roll-hint-ring,
+  .dice-roll-hint-dots{
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
+/* closeDiceOverlayBtn: positioned below dice, color p-550 */
+#diceOverlay #closeDiceOverlayBtn{
+  position: absolute;
+  top: calc(50% + var(--dice-half) + 70px); /* Below dice: center + half dice size + 70px spacing */
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  max-width: 388px;
+  justify-content: center;
+  background: var(--p-550) !important;
+  border-color: var(--p-550) !important;
+  color: #fff;
+  margin-top: 0; /* Override mt-14 class */
+}
+
+#diceOverlay #closeDiceOverlayBtn:hover{
+  background: var(--p-550) !important;
+  border-color: var(--p-550) !important;
+  opacity: 0.9;
+}
+
+/* Dice 3D stage */
+.dice-scene{
+  perspective: 900px;
+  perspective-origin: 50% 40%;
+  display: grid;
+  place-items: center;
+  width: auto;
+  height: auto;
+  overflow: visible; /* ให้ face แสดงผลได้เต็ม ไม่โดนตัด */
+}
+.dice-cam{
+  transform-style: preserve-3d;
+  transform: rotateX(55deg) rotateZ(45deg);
+}
+#dice3d.dice{
+  width: var(--dice-size);
+  height: var(--dice-size);
+  position: relative;
+  transform-style: preserve-3d;
+}
+#dice3d .face{
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  border: 3px solid #111;
+  border-radius: 18px;
+  box-shadow: 0 14px 26px rgba(0,0,0,.18);
+  backface-visibility: hidden;
+}
+#dice3d .face-1{ transform: rotateY(0deg)   translateZ(var(--dice-half)); }   /* front */
+#dice3d .face-2{ transform: rotateY(90deg)  translateZ(var(--dice-half)); }   /* right */
+#dice3d .face-6{ transform: rotateY(180deg) translateZ(var(--dice-half)); }   /* back */
+#dice3d .face-5{ transform: rotateY(-90deg) translateZ(var(--dice-half)); }  /* left */
+#dice3d .face-3{ transform: rotateX(-90deg) translateZ(var(--dice-half)); }  /* top */
+#dice3d .face-4{ transform: rotateX(90deg)  translateZ(var(--dice-half)); }  /* bottom */
+
+#dice3d .pip{
+  position: absolute;
+  width: var(--pip);
+  height: var(--pip);
+  border-radius: 50%;
+  background: var(--pip-color);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.35);
+}
+#dice3d .pip.tl{ left: 22%; top: 22%; }
+#dice3d .pip.tr{ right: 22%; top: 22%; }
+#dice3d .pip.ml{ left: 22%; top: 50%; transform: translateY(-50%); }
+#dice3d .pip.mr{ right: 22%; top: 50%; transform: translateY(-50%); }
+#dice3d .pip.bl{ left: 22%; bottom: 22%; }
+#dice3d .pip.br{ right: 22%; bottom: 22%; }
+#dice3d .pip.c{ left: 50%; top: 50%; transform: translate(-50%,-50%); }
+
+/* =========================
+   13) UTILITIES
+   ========================= */
+.muted{ color: var(--muted); }
+.mt-10{ margin-top:10px; }
+.mt-14{ margin-top:14px; }
+
+/* Header action buttons: keep compact */
+.header-meta button.pill{
+  height: 30px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
