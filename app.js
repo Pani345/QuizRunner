@@ -2254,15 +2254,6 @@ function updateRoleControls(roomData, players) {
   }
 }
 
-function escapeHtml(str = "") {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
 function renderQuestionText(rawText = "") {
   // รองรับทั้ง \n และ \n\n และตัดบรรทัดว่าง
   const lines = rawText
