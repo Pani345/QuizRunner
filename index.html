@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Snake Quiz – Multiplayer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <link rel="stylesheet" href="ui.css" />
+</head>
+
+<body>
+  <!-- Dice (no overlay-card) -->
+  <div id="diceOverlay" style="display:none;">
+    <div class="dice-scene">
+      <!-- ตัวครอบกล้อง: ทำให้เห็น 3 ด้านตลอดเวลา -->
+      <div class="dice-cam">
+        <div id="dice3d" class="dice">
+          <!-- FRONT = 5 -->
+          <div class="face face-1">
+            <span class="pip tl"></span>
+            <span class="pip tr"></span>
+            <span class="pip c"></span>
+            <span class="pip bl"></span>
+            <span class="pip br"></span>
+          </div>
+        
+          <!-- RIGHT = 4 -->
+          <div class="face face-2">
+            <span class="pip tl"></span>
+            <span class="pip tr"></span>
+            <span class="pip bl"></span>
+            <span class="pip br"></span>
+          </div>
+        
+          <!-- TOP = 1 -->
+          <div class="face face-3">
+            <span class="pip c"></span>
+          </div>
+        
+          <!-- BOTTOM = 6 -->
+          <div class="face face-4">
+            <span class="pip tl"></span>
+            <span class="pip ml"></span>
+            <span class="pip bl"></span>
+            <span class="pip tr"></span>
+            <span class="pip mr"></span>
+            <span class="pip br"></span>
+          </div>
+        
+          <!-- LEFT = 3 -->
+          <div class="face face-5">
+            <span class="pip tl"></span>
+            <span class="pip c"></span>
+            <span class="pip br"></span>
+          </div>
+        
+          <!-- BACK = 2 -->
+          <div class="face face-6">
+            <span class="pip tl"></span>
+            <span class="pip br"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button id="rollDiceBtn" type="button" style="display:none;"></button>
+
+    <div id="diceRollHint" class="dice-roll-hint">
+      <div class="dice-roll-hint-ring"></div>
+      <div class="dice-roll-hint-dots"></div>
+    </div>
+
+    <div id="diceHint" class="overlay-hint" style="display:none;">โปรดรอสักครู่…</div>
+
+    <button id="closeDiceOverlayBtn" class="btn-primary mt-14" type="button" style="display:none;">
+      X
+    </button>
+  </div>
+
+  <!-- Question Countdown Overlay -->
+  <div id="questionCountdownOverlay" class="overlay" style="display:none;">
+    <div id="questionCountdownNumber" class="question-countdown-number">3</div>
+  </div>
+  
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand" aria-label="Snake Quiz – Multiplayer">
+        <div class="brand-badge badge-v1" aria-hidden="true">
+          <span class="badge-text">QR</span>
+        </div>
+        
+        <div class="brand-title">
+          <strong>Quiz Runner</strong>
+          <span>Searching Online Databases</span>
+        </div>
+      </div>
+  
+      <div class="header-meta" aria-label="สถานะห้องและบทบาท">
+        <div class="pill" id="uiRoomPill">Room: -</div>
+        <div class="pill" id="uiRolePill">Role: -</div>
+  
+        <!-- Admin button (top-right) -->
+        <button id="adminTopBtn" class="btn-ghost pill" type="button">
+          Admin
+        </button>
+        
+        <!-- Home button (shows on entry pages) -->
+        <button id="headerHomeBtn" class="btn-ghost pill" type="button" style="display:none;">
+          Home
+        </button>
+        
+        <!-- Exit button (shows after start game) -->
+        <button id="headerExitBtn" class="btn-ghost pill" type="button" style="display:none;">
+          ออกจากห้อง
+        </button>
+      </div>
+    </div>
+  </header>
+  
+  <main class="container">
+    <!-- ENTRY (Landing + Admin/Player entry) -->
+    <div id="entrySection">
+      <!-- Landing: Everyone sees this -->
+      <div id="entryLanding" class="card entry-landing">
+        <div class="entry-landing-inner">
+          <h2 class="entry-title">Ready to Run?</h2>
+          <p class="muted entry-sub">
+            Join a race and test your speed, strategy, and knowledge.
+          </p>
+
+          <button id="joinGameBtn" class="btn-primary entry-join-btn" type="button">
+            Join the Race
+          </button>
+  
+        </div>
+      </div>
+  
+      <!-- Admin Entry Page -->
+      <div id="adminEntryPage" class="grid-2" style="display:none;">
+        <div class="card">
+          <h2>Race Organizer</h2>
+  
+          <label for="hostNameInput">Organizer Name</label>
+          <input id="hostNameInput" placeholder="e.g. Coach P'Fon" maxlength="12" autocomplete="name"
+            spellcheck="false" />
+  
+          <button id="createRoomBtn" class="btn-primary" type="button">
+            Set Up the Race
+          </button>
+  
+          <div id="hostGameOptions" class="mt-14" style="display:none;">
+            <div class="section-title">RACE SETUP</div>
+  
+            <div class="card-split">
+              <div class="split-col">
+                <label for="questionSetSelect">Select Track (Race Theme)</label>
+                <select id="questionSetSelect">
+                  <!-- Options will be populated automatically from questions.js -->
+                </select>
+  
+                <label for="maxRoundsInput">Maximum Laps</label>
+                <input id="maxRoundsInput" type="number" min="1" step="1" value="10" inputmode="numeric" />
+              </div>
+  
+              <div class="split-col">
+                <label for="maxWinnersInput">Number of Winners</label>
+                <input id="maxWinnersInput" type="number" min="1" step="1" value="5" inputmode="numeric" />
+  
+                <label for="rewardCorrectInput">Speed Boost (Correct Answer)</label>
+                <input id="rewardCorrectInput" type="number" step="1" value="2" inputmode="numeric" />
+  
+                <label for="penaltyWrongInput">Slow Down (Wrong / Timeout)</label>
+                <input id="penaltyWrongInput" type="number" step="1" value="-2" inputmode="numeric" />
+              </div>
+            </div>
+  
+            <button id="confirmCreateRoomBtn" class="btn-primary mt-14" type="button">
+              Create Race
+            </button>
+          </div>
+        </div>
+  
+        <div class="card" aria-hidden="true">
+          <h2>How to play</h2>
+          <p class="muted">
+            Admin สร้างห้องและแชร์ Race Code ให้ผู้เล่น จากนั้นเริ่มเกมใน Lobby
+          </p>
+        </div>
+      </div>
+  
+      <!-- Player Entry Page -->
+      <div id="playerEntryPage" class="grid-2" style="display:none;">
+        <div class="card">
+          <h2>Runner Registration</h2>
+  
+          <label for="roomCodeInput">Race Code</label>
+          <input id="roomCodeInput" placeholder="Enter Race Code" maxlength="12" autocapitalize="characters"
+            autocomplete="off" spellcheck="false" />
+  
+          <label for="playerNameInput">Runner name</label>
+          <input id="playerNameInput" placeholder="e.g. Runner A" maxlength="12" autocomplete="name"
+            spellcheck="false" />
+  
+          <button id="joinRoomBtn" class="btn-primary" type="button">
+            Join the Race
+          </button>
+        </div>
+  
+        <div class="card" aria-hidden="true">
+          <h2>Race Tip</h2>
+          <p class="muted">
+            Make sure your race code is correct and your runner name is unique.
+          </p>
+        </div>
+      </div>
+    </div>
+  
+    <!-- LOBBY -->
+    <div id="lobby" style="display:none;">
+      <div class="lobby-bar mt-14">
+        <div class="section-title">LOBBY</div>
+    
+        <div id="lobbyBadges" class="lobby-badges" aria-label="สถานะห้อง"></div>
+    
+        <div class="lobby-actions"></div>
+      </div>
+    
+      <div class="card lobby-card">
+        <div class="lobby-card-head">
+          <div id="roleInfo" class="muted role-line" aria-live="polite"></div>
+        </div>
+    
+        <div class="lobby-list-head">
+          <div class="lobby-list-title"><strong>รายชื่อผู้เล่นในห้อง:</strong></div>
+    
+          <div class="lobby-list-actions">
+            <button id="startGameBtn" class="btn-primary" type="button" style="display:none;">
+              เริ่มเล่น
+            </button>
+          </div>
+        </div>
+    
+        <!-- ✅ เปลี่ยนจาก ul เป็น div -->
+        <div id="playerList" aria-label="รายชื่อผู้เล่น"></div>
+      </div>
+    </div>
+    
+    <!-- GAME BAR -->
+    <div id="gameBar" class="lobby-bar mt-14" style="display:none;">
+      <div class="section-title">GAME BOARD</div>
+    
+      <div class="lobby-badges">
+        <div class="lobby-badge" id="roundInfo">รอบที่: -</div>
+        <div class="lobby-badge" id="phaseInfo">[สถานะรอบ: -]</div>
+      </div>
+    
+      <div id="hostGameControls" class="lobby-actions" style="display:none;">
+        <button id="startRoundBtn" class="btn-primary" type="button">เริ่มรอบใหม่</button>
+        <button id="startQuestionBtn" class="btn-ghost" type="button">เริ่มคำถาม</button>
+        <button id="toggleQuestionOverlayBtn" class="btn-ghost" type="button" style="display:none;">
+          ซ่อนคำถาม
+        </button>
+        <button id="revealAnswerBtn" class="btn-ghost" type="button">เฉลยคำถาม</button>
+      </div>
+    
+      <div id="playerGameControls" class="lobby-actions" style="display:none;">
+      </div>
+    </div>
+    
+    <!-- GAME AREA -->
+    <div id="gameArea" class="card" style="display:none;">
+      <div id="board"></div>
+    
+      <div id="endGameArea" style="display:none; margin-top:1rem;">
+        <h3 id="endGameTitle" style="margin:0;">สรุปผลเกม</h3>
+        <div id="endGameSummary"></div>
+      </div>          
+    </div>
+    
+    <!-- ✅ NEW: slot สำหรับย้าย lobby-card มาวางใต้ gameArea ตอนเริ่มเกมแล้ว -->
+    <div id="lobbyCardHost" style="display:none;"></div>
+    
+    <!-- QUESTION AREA -->
+    <div id="questionAreaOverlay" class="overlay" style="display:none;">
+      <div id="questionArea" class="card">
+      <div id="countdownDisplay" aria-live="assertive"></div>
+      <div id="questionText"></div>
+      <div id="choicesContainer"></div>
+      </div>
+      <button id="closeQuestionAreaBtn" class="btn-primary" type="button" style="display:none;">
+        X
+      </button>
+    </div>
+  </main>
+
+  <noscript>เกมนี้ต้องเปิดใช้งาน JavaScript</noscript>
+  <!-- Admin Password Overlay -->
+  <div id="adminPwOverlay" class="overlay" style="display:none;">
+    <div class="overlay-card">
+      <div class="overlay-title">Admin Access</div>
+      <div class="overlay-hint">กรอกรหัส 4 หลักเพื่อเข้าสู่หน้า Admin</div>
+  
+      <input id="adminPwInput" type="password" inputmode="numeric" autocomplete="one-time-code" maxlength="4"
+        placeholder="••••"
+        style="margin-top:12px; text-align:center; font-size:22px; letter-spacing:10px; font-weight:900;" />
+  
+      <div id="adminPwError" class="muted" style="margin-top:10px; color:#c62828; font-weight:900; display:none;">
+        รหัสไม่ถูกต้อง
+      </div>
+  
+      <button id="adminPwCancelBtn" class="btn-ghost mt-14" type="button">
+        ยกเลิก
+      </button>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+
+</html>
