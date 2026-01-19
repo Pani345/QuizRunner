@@ -406,7 +406,7 @@ export const QUESTION_SETS = {
     },
   ],
    
-   food Q1: [
+   food1: [
      {
        text: "Question : In the article “Microbiological safety and quality of ceviche, poke, and sushi dishes sold at retail outlets in Orange County, CA”, at what annual rate has global seafood consumption increased (from 1961 to 2017)?\nคำถาม : บทความนี้ ระบุอัตราการบริโภคอาหารทะเลทั่วโลกเพิ่มขึ้นกี่เปอร์เซ็นต์ต่อปี\nHint : In the first paragraph of the introduction.\nDatabase : ScienceDirect",
        choices: { A: "3.0%", B: "3.1%", C: "3.2%" },
@@ -521,7 +521,7 @@ export const QUESTION_SET_NAMES = {
   love: "ไม่เป็นไร (แต่จำได้หมด)",
   friends: "Friends, Fun & Facts",
   money: "Money Coach ที่ยังต้องรอเงินเดือน",
-  food Q1: "Food Quest set 1",
+  food1: "Food Quest set 1",
 };
 
 /**
