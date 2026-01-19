@@ -408,43 +408,43 @@ export const QUESTION_SETS = {
    
    food1: [
      {
-       text: "Question : In the article “Microbiological safety and quality of ceviche, poke, and sushi dishes sold at retail outlets in Orange County, CA”, at what annual rate has global seafood consumption increased (from 1961 to 2017)?\nคำถาม : บทความนี้ ระบุอัตราการบริโภคอาหารทะเลทั่วโลกเพิ่มขึ้นกี่เปอร์เซ็นต์ต่อปี\nHint : In the first paragraph of the introduction.\nDatabase : ScienceDirect",
+       text: "Question : In the article “Microbiological safety and quality of ceviche, poke, and sushi dishes sold at retail outlets in Orange County, CA”, at what annual rate has global seafood consumption increased (from 1961 to 2017)?\n\nคำถาม : บทความนี้ ระบุอัตราการบริโภคอาหารทะเลทั่วโลกเพิ่มขึ้นกี่เปอร์เซ็นต์ต่อปี\n\nHint : In the first paragraph of the introduction.\n\nDatabase : ScienceDirect",
        choices: { A: "3.0%", B: "3.1%", C: "3.2%" },
        correctOption: "B",
        timeLimit: 120,
      },
      {
-       text: "Question : In the article “Kimchi and its antiobesity and anticancer functions”, what is the recommended cut size (in centimeters) for Matbaechu kimchi when preparing Baechu cabbage kimchi?\nคำถาม : บทความนี้ ระบุควรหั่น Matbaechu kimchi (ผักกาดขาว) ให้มีขนาดกี่เซนติเมตร สำหรับเตรียมทำเมนู Baechu cabbage kimchi (กิมจิผักกาดขาวแบบดั้งเดิมของเกาหลี)\nHint : In the Fig. 1.\nDatabase : SpringerNature Link",
+       text: "Question : In the article “Kimchi and its antiobesity and anticancer functions”, what is the recommended cut size (in centimeters) for Matbaechu kimchi when preparing Baechu cabbage kimchi?\n\nคำถาม : บทความนี้ ระบุควรหั่น Matbaechu kimchi (ผักกาดขาว) ให้มีขนาดกี่เซนติเมตร สำหรับเตรียมทำเมนู Baechu cabbage kimchi (กิมจิผักกาดขาวแบบดั้งเดิมของเกาหลี)\n\nHint : In the Fig. 1.\n\nDatabase : SpringerNature Link",
        choices: { A: "3-5 centimeters", B: "3-4 centimeters", C: "2-3 centimeters" },
        correctOption: "A",
        timeLimit: 120,
      },
      {
-       text: "Question : In the article “Nutritional quality of organic, conventional, and seasonally grown broccoli using vitamin C as a marker”, which vegetable contains the highest amount of ascorbic acid?\nคำถาม : บทความนี้ ผักชนิดใดมีปริมาณกรดแอสคอร์บิกมากที่สุด\nHint : In the Figure 4.\nDatabase : Taylor & Francis Online",
+       text: "Question : In the article “Nutritional quality of organic, conventional, and seasonally grown broccoli using vitamin C as a marker”, which vegetable contains the highest amount of ascorbic acid?\n\nคำถาม : บทความนี้ ผักชนิดใดมีปริมาณกรดแอสคอร์บิกมากที่สุด\n\nHint : In the Figure 4.\n\nDatabase : Taylor & Francis Online",
        choices: { A: "swamp cabbage", B: "Chinese kale", C: "spinach" },
        correctOption: "C",
        timeLimit: 120,
      },
      {
-       text: "Question : Which email address should be used to contact the Research Support Service at the Central Library, Chulalongkorn University?\nคำถาม : อีเมลใด เป็นช่องทางสำหรับติดต่อบริการสนับสนุนงานวิจัย ของหอสมุดกลางจุฬาฯ\nHint : -\nDatabase : -",
+       text: "Question : Which email address should be used to contact the Research Support Service at the Central Library, Chulalongkorn University?\n\nคำถาม : อีเมลใด เป็นช่องทางสำหรับติดต่อบริการสนับสนุนงานวิจัย ของหอสมุดกลางจุฬาฯ\n\nHint : -\n\nDatabase : -",
        choices: { A: "rsp@car.chula.ac.th", B: "rcs@car.chula.ac.th", C: "rss@car.chula.ac.th" },
        correctOption: "C",
        timeLimit: 120,
      },
      {
-       text: "Question : In the article \"Contribution of black olives and other vegetable toppings to acrylamide formation in pizzas\", what range does the acrylamide content in pizza fall (in µg/kg)?\nคำถาม : บทความนี้ ระบุว่าพิซซ่ามีปริมาณอะคริลาไมด์ (acrylamide) กี่ไมโครกรัมต่อกิโลกรัม\nHint : In the second paragraph of the introduction.\nDatabase : ScienceDirect",
+       text: "Question : In the article \"Contribution of black olives and other vegetable toppings to acrylamide formation in pizzas\", what range does the acrylamide content in pizza fall (in µg/kg)?\n\nคำถาม : บทความนี้ ระบุว่าพิซซ่ามีปริมาณอะคริลาไมด์ (acrylamide) กี่ไมโครกรัมต่อกิโลกรัม\n\nHint : In the second paragraph of the introduction.\n\nDatabase : ScienceDirect",
        choices: { A: "60 - 250 µg/kg", B: "70 - 260 µg/kg", C: "80 - 270 µg/kg" },
        correctOption: "A",
        timeLimit: 120,
      },
      {
-       text: "Question : In the article “Farmer Business School participation and its impact on cocoa productivity and food security in Ghana”, what percentage of Ghana’s export earnings comes from cocoa?\nคำถาม : บทความนี้ รายได้จากการส่งออกของกานามาจากโกโก้กี่ %?\nHint : In the first paragraph of the introduction.\nDatabase : Emerald Management",
+       text: "Question : In the article “Farmer Business School participation and its impact on cocoa productivity and food security in Ghana”, what percentage of Ghana’s export earnings comes from cocoa?\n\nคำถาม : บทความนี้ รายได้จากการส่งออกของกานามาจากโกโก้กี่ %?\n\nHint : In the first paragraph of the introduction.\n\nDatabase : Emerald Management",
        choices: { A: "about 18%", B: "about 28%", C: "about 38%" },
        correctOption: "A",
        timeLimit: 120,
      },
      {
-       text: "Question : In the article “Sushi Delights and Parasites: The Risk of Fishborne and Foodborne Parasitic Zoonoses in Asia”, at what temperature and for how long should marine fish for raw consumption be frozen under the European Union–Hazard Analysis and Critical Control Points (HACCP) guidelines?\nคำถาม : บทความนี้ ระบุว่า HACCP (กฎหมายสำหรับธุรกิจอาหาร่ในสหภาพยุโรป) กำหนดให้แช่แข็งปลาทะเลเพื่อบริโภคแบบดิบที่อุณหภูมิเท่าไรและเป็นเวลานานเท่าใด\nHint : In the first paragraph of the conclusions.\nDatabase : Oxford Journals Online",
+       text: "Question : In the article “Sushi Delights and Parasites: The Risk of Fishborne and Foodborne Parasitic Zoonoses in Asia”, at what temperature and for how long should marine fish for raw consumption be frozen under the European Union–Hazard Analysis and Critical Control Points (HACCP) guidelines?\n\nคำถาม : บทความนี้ ระบุว่า HACCP (กฎหมายสำหรับธุรกิจอาหาร่ในสหภาพยุโรป) กำหนดให้แช่แข็งปลาทะเลเพื่อบริโภคแบบดิบที่อุณหภูมิเท่าไรและเป็นเวลานานเท่าใด\n\nHint : In the first paragraph of the conclusions.\n\nDatabase : Oxford Journals Online",
        choices: {
          A: "less than -10°C for more than 24 h.",
          B: "less than -15°C for more than 24 h.",
@@ -454,19 +454,19 @@ export const QUESTION_SETS = {
        timeLimit: 120,
      },
      {
-       text: "Question : Which Boolean operator is used to exclude unwanted terms from search results?\nคำถาม : Boolean operator ข้อใดที่ใช้ในการตัดคำที่ไม่ต้องการออกจากผลลัพธ์\nHint : -\nDatabase : -",
+       text: "Question : Which Boolean operator is used to exclude unwanted terms from search results?\n\nคำถาม : Boolean operator ข้อใดที่ใช้ในการตัดคำที่ไม่ต้องการออกจากผลลัพธ์\n\nHint : -\n\nDatabase : -",
        choices: { A: "AND", B: "OR", C: "NOT" },
        correctOption: "C",
        timeLimit: 120,
      },
      {
-       text: "Question : In the article “Improving stability of frying oils and food quality with addition of dried olive mill wastewater”, which analytical technique was used to determine the polyphenolic composition of the dried olive mill wastewater?\nคำถาม : บทความนี้ ผู้วิจัยใช้เทคนิคใดวิเคราะห์องค์ประกอบของสารโพลีฟีนอลในน้ำเสียจากโรงงานผลิตน้ำมันมะกอกแห้ง\nHint : In the first paragraph of the results and discussion.\nDatabase : Nature",
+       text: "Question : In the article “Improving stability of frying oils and food quality with addition of dried olive mill wastewater”, which analytical technique was used to determine the polyphenolic composition of the dried olive mill wastewater?\n\nคำถาม : บทความนี้ ผู้วิจัยใช้เทคนิคใดวิเคราะห์องค์ประกอบของสารโพลีฟีนอลในน้ำเสียจากโรงงานผลิตน้ำมันมะกอกแห้ง\n\nHint : In the first paragraph of the results and discussion.\n\nDatabase : Nature",
        choices: { A: "GC-FID", B: "LC-MS", C: "HPLC" },
        correctOption: "C",
        timeLimit: 120,
      },
      {
-       text: "Question : Which symbol is used to search for an exact phrase without splitting the words?\nคำถาม : เครื่องหมายใดใช้ช่วยค้นหาวลีหรือประโยคแบบตรงตัวโดยไม่แยกคำออกจากกัน\nHint : -\nDatabase : -",
+       text: "Question : Which symbol is used to search for an exact phrase without splitting the words?\n\nคำถาม : เครื่องหมายใดใช้ช่วยค้นหาวลีหรือประโยคแบบตรงตัวโดยไม่แยกคำออกจากกัน\n\nHint : -\n\nDatabase : -",
        choices: {
          A: "Quotation marks หรือเครื่องหมายอัญประกาศ (\"...\")",
          B: "Question mark หรือเครื่องหมายคำถาม (?)",
@@ -476,6 +476,7 @@ export const QUESTION_SETS = {
        timeLimit: 120,
      },
    ],
+
 };
 
 /**
