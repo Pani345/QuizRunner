@@ -616,7 +616,74 @@ export const QUESTION_SETS = {
        timeLimit: 120,
      },
    ],
+   food4: [
+     {
+       text: "Question : If you want the results to show pizza or pasta (either one), how should you type the query?\n\nคำถาม : หากต้องการให้ผลลัพธ์ปรากฏคำว่า pizza หรือ pasta (อย่างใดอย่างหนึ่ง) ควรพิมพ์คำค้นอย่างไร\n\nHint : -\n\nDatabase : -",
+       choices: { A: "pizza OR pasta", B: "pizza or pasta", C: "pizza Or pasta" },
+       correctOption: "A",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : How many authors are there in the article \"Acorn flour and sourdough: an innovative combination to improve gluten free bread characteristics\"?\n\nคำถาม : บทความเรื่องนี้ มีผู้แต่งกี่คน\n\nHint : -\n\nDatabase : SpringerNature Link",
+       choices: { A: "4 people", B: "6 people", C: "8 people" },
+       correctOption: "B",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : In the article “Kimchi and its antiobesity and anticancer functions”, what is the recommended cut size (in centimeters) for Matbaechu kimchi when preparing Baechu cabbage kimchi?\n\nคำถาม : บทความนี้ ระบุควรหั่น Matbaechu kimchi (ผักกาดขาว) ให้มีขนาดกี่เซนติเมตร สำหรับเตรียมทำเมนู Baechu cabbage kimchi (กิมจิผักกาดขาวแบบดั้งเดิมของเกาหลี)\n\nHint : In the Fig. 1.\n\nDatabase : SpringerNature Link",
+       choices: { A: "3-5 centimeters", B: "3-4 centimeters", C: "2-3 centimeters" },
+       correctOption: "A",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : In the article \"Goose meat production and consumption: current knowledge and market challenges\" what is the projected global goose meat production in 2027?\n\nคำถาม : บทความนี้ คาดการณ์การผลิตเนื้อห่านทั่วโลกในปี 2027 อยู่ที่เท่าใด\n\nHint : In the introduction.\n\nDatabase : Taylor & Francis Online",
+       choices: { A: "3.75 million tons", B: "4.75 million tons", C: "5.75 million tons" },
+       correctOption: "B",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : Which symbol should be used if you want to search for words with the same root, such as educate, education, educational?\n\nคำถาม : ควรใช้เครื่องหมายใด หากต้องการค้นหาคำที่มีรากศัพท์เดียวกัน เช่น educate, education, educational\n\nHint : -\n\nDatabase : -",
+       choices: { A: "*", B: "+", C: "&" },
+       correctOption: "A",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : In the article “Effect of a popular Middle Eastern food (Falafel) on rat liver”, which cooking method is used to prepare falafel?\n\nคำถาม : บทความนี้ ระบุว่าฟาลาเฟล (Falafel) เป็นอาหารที่ปรุงด้วยวิธีใด\n\nHint : In the first paragraph of the introduction.\n\nDatabase : Taylor & Francis Online",
+       choices: { A: "Boiled food", B: "Grilled food", C: "Fried food" },
+       correctOption: "C",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : The article “Teacher, I Don't Know How to Describe ‘Tom Yum Kung’ in English, but I Know ‘Hamburger’ and ‘Pizza’: Will Global Englishes Language Teaching be a Beacon of Hope or a Recipe for Disaster in Thai ELT?” was published in what year and in what journal?\n\nคำถาม : บทความนี้ตีพิมพ์เผยแพร่ในปีใดและในวารสารชื่ออะไร\n\nHint : -\n\nDatabase : Wiley Online Library",
+       choices: {
+         A: "Clin Infect Dis, Published in 2024.",
+         B: "The International Journal of Applied Linguistics, Published in 2024.",
+         C: "Clinical Infectious Diseases, Published in 2024.",
+       },
+       correctOption: "B",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : In the article “The Demand and Allocation of Alaskan and Canadian Snow Crab”, what is the time range shown in Figure 1 for Alaskan crab landings?\n\nคำถาม : กราฟในรูปที่ 1 ในบทความนี้ แสดงข้อมูลการจับปู Alaskan ในช่วงปีใด\n\nHint : In the Figure 1.\n\nDatabase : Wiley Online Library",
+       choices: { A: "1950-2000", B: "1950-2001", C: "1950-2002" },
+       correctOption: "C",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : If you want the results to show food safety as an exact phrase, how should you type the query?\n\nคำถาม : หากต้องการให้ผลลัพธ์ปรากฏคำว่า food safety แบบติดกัน ควรพิมพ์คำค้นอย่างไร\n\nHint : -\n\nDatabase : -",
+       choices: { A: "food AND safety", B: "\"food safety\"", C: "food-safety" },
+       correctOption: "B",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : In the article “A brief nudge or education intervention delivered online can increase willingness to order a beef-mushroom burger”, approximately how many cows were slaughtered in 2018?\n\nคำถาม : บทความนี้ มีวัวถูกฆ่าเพื่อการผลิตเนื้อวัวประมาณกี่ล้านตัว ในปี 2018\n\nHint : In the first paragraph of the introduction.\n\nDatabase : ScienceDirect",
+       choices: { A: "106.7 million cows", B: "54.2 million cows", C: "33.7 million cows" },
+       correctOption: "C",
+       timeLimit: 120,
+     },
+   ],
 
+   
 };
 
 /**
@@ -665,6 +732,7 @@ export const QUESTION_SET_NAMES = {
   food1: "Food Quest set 1",
   food2: "Food Quest set 2",
   food3: "Food Quest set 3",
+  food4: "Food Quest set 4",
 };
 
 /**
