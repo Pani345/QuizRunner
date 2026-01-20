@@ -2969,7 +2969,7 @@ function renderEndGameSummary(roomData, players) {
           <th>#</th>
           <th class="name-col">รายชื่อผู้เล่น</th>
           <th>ตำแหน่ง</th>
-          <th>เข้าเส้นชัย?</th>
+          <th>เข้าเส้นชัย</th>
           <th>รอบที่เข้า</th>
           <th>วิธีเข้า</th>
           <th>ผลทอย</th>
