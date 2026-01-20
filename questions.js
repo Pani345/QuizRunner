@@ -476,6 +476,76 @@ export const QUESTION_SETS = {
        timeLimit: 120,
      },
    ],
+food2: [
+  {
+    text: "Question : Which email address should be used to contact the Research Support Service at the Central Library, Chulalongkorn University?\n\nคำถาม : อีเมลใด เป็นช่องทางสำหรับติดต่อบริการสนับสนุนงานวิจัย ของหอสมุดกลางจุฬาฯ\n\nHint : -\n\nDatabase : -",
+    choices: { A: "rsp@car.chula.ac.th", B: "rcs@car.chula.ac.th", C: "rss@car.chula.ac.th" },
+    correctOption: "C",
+    timeLimit: 120,
+  },
+  {
+    text: "Question : Which Boolean operator is used to exclude unwanted terms from search results?\n\nคำถาม : Boolean operator ข้อใดที่ใช้ในการตัดคำที่ไม่ต้องการออกจากผลลัพธ์\n\nHint : -\n\nDatabase : -",
+    choices: { A: "AND", B: "OR", C: "NOT" },
+    correctOption: "C",
+    timeLimit: 120,
+  },
+  {
+    text: "Question : Which symbol is used to search for an exact phrase without splitting the words?\n\nคำถาม : เครื่องหมายใดใช้ช่วยค้นหาวลีหรือประโยคแบบตรงตัวโดยไม่แยกคำออกจากกัน\n\nHint : -\n\nDatabase : -",
+    choices: {
+      A: "Quotation marks หรือเครื่องหมายอัญประกาศ (\"...\")",
+      B: "Question mark หรือเครื่องหมายคำถาม (?)",
+      C: "Nesting หรือเครื่องหมายวงเล็บ ((...))",
+    },
+    correctOption: "A",
+    timeLimit: 120,
+  },
+  {
+    text: "Question : Which Boolean operator should be used to broaden the search results?\n\nคำถาม : ควรใช้ Boolean operator ใด หากต้องการให้ผลการสืบค้นกว้างขึ้น\n\nHint : -\n\nDatabase : -",
+    choices: { A: "AND", B: "OR", C: "NOT" },
+    correctOption: "B",
+    timeLimit: 120,
+  },
+  {
+    text: "Question : Which symbol should be used if you want to search for words with the same root, such as educate, education, educational?\n\nคำถาม : ควรใช้เครื่องหมายใด หากต้องการค้นหาคำที่มีรากศัพท์เดียวกัน เช่น educate, education, educational\n\nHint : -\n\nDatabase : -",
+    choices: { A: "*", B: "+", C: "&" },
+    correctOption: "A",
+    timeLimit: 120,
+  },
+  {
+    text: "Question : What is the purpose of using a Year filter in database searching?\n\nคำถาม : การใช้ตัวกรองปี มีประโยชน์อย่างไร\n\nHint : -\n\nDatabase : -",
+    choices: {
+      A: "To increase the number of results (เพิ่มจำนวนผลลัพธ์ให้มากขึ้น)",
+      B: "To limit results to a specific time period (จำกัดผลลัพธ์ให้เฉพาะช่วงเวลาที่ต้องการ)",
+      C: "To find similar words (ค้นหาคำที่คล้ายกัน)",
+    },
+    correctOption: "B",
+    timeLimit: 120,
+  },
+  {
+    text: "Question : If you want the results to show food safety as an exact phrase, how should you type the query?\n\nคำถาม : หากต้องการให้ผลลัพธ์ปรากฏคำว่า food safety แบบติดกัน ควรพิมพ์คำค้นอย่างไร\n\nHint : -\n\nDatabase : -",
+    choices: { A: "food AND safety", B: "\"food safety\"", C: "food-safety" },
+    correctOption: "B",
+    timeLimit: 120,
+  },
+  {
+    text: "Question : If you want the results to appear for the years 2019–2024, which filter should you use in the database?\n\nคำถาม : หากต้องการให้ผลลัพธ์ปรากฏในช่วงปี 2019–2024 ควรใช้ตัวใดในฐานข้อมูล\n\nHint : -\n\nDatabase : -",
+    choices: { A: "Language filter", B: "Document type filter", C: "Publication date filter" },
+    correctOption: "C",
+    timeLimit: 120,
+  },
+  {
+    text: "Question : If you want the results to show pizza or pasta (either one), how should you type the query?\n\nคำถาม : หากต้องการให้ผลลัพธ์ปรากฏคำว่า pizza หรือ pasta (อย่างใดอย่างหนึ่ง) ควรพิมพ์คำค้นอย่างไร\n\nHint : -\n\nDatabase : -",
+    choices: { A: "pizza OR pasta", B: "pizza or pasta", C: "pizza Or pasta" },
+    correctOption: "A",
+    timeLimit: 120,
+  },
+  {
+    text: "Question : If you can’t find the full text of a research article, which Facebook page should Chulalongkorn University members message for help?\n\nคำถาม : หากชาวจุฬาฯ ค้นหา full text ของบทความวิจัยไม่พบ สามารถติดต่อสอบถามผ่าน Facebook เพจใด\n\nHint : -\n\nDatabase : -",
+    choices: { A: "RefCU", B: "CURef", C: "ChulaRef" },
+    correctOption: "B",
+    timeLimit: 120,
+  },
+],
 
 };
 
