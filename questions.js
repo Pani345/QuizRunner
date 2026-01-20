@@ -593,6 +593,7 @@ export const QUESTION_SET_NAMES = {
   friends: "Friends, Fun & Facts",
   money: "Money Coach ที่ยังต้องรอเงินเดือน",
   food1: "Food Quest set 1",
+  food2: "Food Quest set 2",
 };
 
 /**
