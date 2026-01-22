@@ -478,9 +478,9 @@ export const QUESTION_SETS = {
    ],
    food2: [
      {
-       text: "Question : Which email address should be used to contact the Research Support Service at the Central Library, Chulalongkorn University?\n\nคำถาม : อีเมลใด เป็นช่องทางสำหรับติดต่อบริการสนับสนุนงานวิจัย ของหอสมุดกลางจุฬาฯ\n\nHint : -\n\nDatabase : -",
-       choices: { A: "rsp@car.chula.ac.th", B: "rcs@car.chula.ac.th", C: "rss@car.chula.ac.th" },
-       correctOption: "C",
+       text: "Question : If you can’t find the full text of a research article, which Facebook page should Chulalongkorn University members message for help?\n\nคำถาม : หากชาวจุฬาฯ ค้นหา full text ของบทความวิจัยไม่พบ สามารถติดต่อสอบถามผ่าน Facebook เพจใด\n\nHint : -\n\nDatabase : -",
+       choices: { A: "RefCU", B: "CURef", C: "ChulaRef" },
+       correctOption: "B",
        timeLimit: 120,
      },
      {
@@ -540,9 +540,9 @@ export const QUESTION_SETS = {
        timeLimit: 120,
      },
      {
-       text: "Question : If you can’t find the full text of a research article, which Facebook page should Chulalongkorn University members message for help?\n\nคำถาม : หากชาวจุฬาฯ ค้นหา full text ของบทความวิจัยไม่พบ สามารถติดต่อสอบถามผ่าน Facebook เพจใด\n\nHint : -\n\nDatabase : -",
-       choices: { A: "RefCU", B: "CURef", C: "ChulaRef" },
-       correctOption: "B",
+        text: "Question : Which email address should be used to contact the Research Support Service at the Central Library, Chulalongkorn University?\n\nคำถาม : อีเมลใด เป็นช่องทางสำหรับติดต่อบริการสนับสนุนงานวิจัย ของหอสมุดกลางจุฬาฯ\n\nHint : -\n\nDatabase : -",
+       choices: { A: "rsp@car.chula.ac.th", B: "rcs@car.chula.ac.th", C: "rss@car.chula.ac.th" },
+       correctOption: "C",
        timeLimit: 120,
      },
    ],
