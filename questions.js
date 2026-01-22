@@ -682,7 +682,108 @@ export const QUESTION_SETS = {
        timeLimit: 120,
      },
    ],
-
+   food5: [
+     {
+       text: "Question : If you want the results to show pizza or pasta (either one), how should you type the query?\n\nคำถาม : หากต้องการให้ผลลัพธ์ปรากฏคำว่า pizza หรือ pasta (อย่างใดอย่างหนึ่ง) ควรพิมพ์คำค้นอย่างไร\n\nHint : -\n\nDatabase : -",
+       choices: {
+         A: "pizza OR pasta",
+         B: "pizza or pasta",
+         C: "pizza Or pasta",
+       },
+       correctOption: "A",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : In the article “The Demand and Allocation of Alaskan and Canadian Snow Crab”, what is the time range shown in Figure 1 for Alaskan crab landings?\n\nคำถาม : กราฟในรูปที่ 1 ในบทความนี้ แสดงข้อมูลการจับปู Alaskan ในช่วงปีใด\n\nHint : In the Figure 1.\n\nDatabase : Wiley Online Library",
+       choices: {
+         A: "1950-2000",
+         B: "1950-2001",
+         C: "1950-2002",
+       },
+       correctOption: "C",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : How many authors are there in the article “Would offering vegetables to children for breakfast increase their total daily vegetable intake?”?\n\nคำถาม : บทความเรื่องนี้ มีผู้แต่งกี่คน\n\nHint : -\n\nDatabase : Cambridge Journals Online",
+       choices: {
+         A: "2 people",
+         B: "3 people",
+         C: "4 people",
+       },
+       correctOption: "B",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : Which symbol should be used if you want to search for words with the same root, such as nutrition, nutritional, nutritious?\n\nคำถาม : ควรใช้เครื่องหมายใด หากต้องการค้นหาคำที่มีรากศัพท์เดียวกัน เช่น nutrition, nutritional, nutritious\n\nHint : -\n\nDatabase : -",
+       choices: {
+         A: "*",
+         B: "+",
+         C: "&",
+       },
+       correctOption: "A",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : In the article \"Contribution of black olives and other vegetable toppings to acrylamide formation in pizzas\", what range does the acrylamide content in pizza fall (in µg/kg)?\n\nคำถาม : บทความนี้ ระบุว่าพิซซ่ามีปริมาณอะคริลาไมด์ (acrylamide) กี่ไมโครกรัมต่อกิโลกรัม\n\nHint : In the second paragraph of the introduction.\n\nDatabase : ScienceDirect",
+       choices: {
+         A: "60 - 250 µg/kg",
+         B: "70 - 260 µg/kg",
+         C: "80 - 270 µg/kg",
+       },
+       correctOption: "A",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : In the article “Effects of freezing rate and terminal freezing temperature on frozen croissant dough quality”, what variable is shown on the y-axis of Figure 1?\n\nคำถาม : แกน y ของรูปที่ 1 ในบทความนี้ แสดงค่าใด\n\nHint : -\n\nDatabase : ScienceDirect",
+       choices: {
+         A: "Temperature",
+         B: "Yeast viability",
+         C: "Specific volume",
+       },
+       correctOption: "A",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : In the article “Pad Thai: the Thai-ization of Chinese food and the Thai nationalism project by the Phibunsongkhram government”, which of the following is NOT a keyword of the article?\n\nคำถาม : ข้อใดไม่ใช่คำสำคัญของบทความเรื่องนี้\n\nHint : -\n\nDatabase : Taylor & Francis Online",
+       choices: {
+         A: "kway teow",
+         B: "localization of food",
+         C: "national cuisine",
+       },
+       correctOption: "C",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : If you want the results to show food safety as an exact phrase, how should you type the query?\n\nคำถาม : หากต้องการให้ผลลัพธ์ปรากฏคำว่า food safety แบบติดกัน ควรพิมพ์คำค้นอย่างไร\n\nHint : -\n\nDatabase : -",
+       choices: {
+         A: "food AND safety",
+         B: "\"food safety\"",
+         C: "food-safety",
+       },
+       correctOption: "B",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : In the article “High-fiber breakfast cereals using only carrot and cereal by-products”, what does the ‘BCP’ stand for?\n\nคำถาม : ‘BCP’ ในบทความนี้ ย่อมาจากคำว่าอะไร\n\nHint : In the first paragraph of the introduction.\n\nDatabase : ScienceDirect",
+       choices: {
+         A: "Breakfast Cookie Products",
+         B: "Breakfast Cereals Protein",
+         C: "Breakfast Cereals Products",
+       },
+       correctOption: "C",
+       timeLimit: 120,
+     },
+     {
+       text: "Question : In the article “Nutritional quality of organic, conventional, and seasonally grown broccoli using vitamin C as a marker”, which vegetable contains the highest amount of ascorbic acid?\n\nคำถาม : บทความนี้ ผักชนิดใดมีปริมาณกรดแอสคอร์บิกมากที่สุด\n\nHint : In the Figure 4.\n\nDatabase : Taylor & Francis Online",
+       choices: {
+         A: "swamp cabbage",
+         B: "Chinese kale",
+         C: "spinach",
+       },
+       correctOption: "C",
+       timeLimit: 120,
+     },
+   ],
    
 };
 
@@ -733,6 +834,7 @@ export const QUESTION_SET_NAMES = {
   food2: "Food Quest set 2",
   food3: "Food Quest set 3",
   food4: "Food Quest set 4",
+  food5: "Food Quest set 5",
 };
 
 /**
