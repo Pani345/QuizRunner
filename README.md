@@ -1,102 +1,82 @@
 # QuizRunner
 Searching online database
-QuizRunner SPA (Firebase RTDB Multiplayer)
 
+QuizRunner SPA (Firebase RTDB Multiplayer)
 เกมกระดาน + คำถามแบบ Multiplayer (Host 1 คน + ผู้เล่นหลายคน) ทำงานแบบ SPA โดยใช้ Firebase Realtime Database เป็น state กลางของห้อง
 
 แนวคิดหลัก
-
 ห้องเกม 1 ห้อง = 1 node ใน RTDB: rooms/{ROOM_CODE}
-
 ทุก client (host/player) subscribe ห้องเดียวกันด้วย onValue() แล้ว render UI จาก roomData
-
 การกระทำสำคัญที่ต้องกันชนกัน (start round / roll / submit / reveal) ใช้ runTransaction() เพื่อความ atomic
 
+ลำดับ Code
+1) Imports
+2) Firebase init + global error logs
+3) Constants/Enums + Storage
+4) Runtime state
+5) DOM cache (และคอมเมนต์ “unused?” ไว้ชัด)
+6) Utils (รวม normalize/clamp/session/header)
+7) QuestionSet UI init (populateQuestionSetSelect)
+8) Entry Navigation (SPA) (showEntryLanding/showAdminEntryPage/showPlayerEntryPage)
+9) Admin PIN overlay functions
+10) Room subscribe + Lobby view (enterLobbyView/subscribeRoom/updateStartGameButton/...)
+11) Host flows (create room/start game/start round/start question/reveal)
+12) Player flows (join/roll/submit)
+13) Transactions helpers (finalizeRollTransaction/submitAnswerTx/moveCountdownToAnsweringTx)
+14) UI render (updateGameView/updateRoleControls/updateQuestionUI/renderChoices/renderPlayerList/renderBoard/renderEndGameSummary)
+15) Timer (ensureTimer/clearTimer)
+16) Dice overlay state + Dice engine subsystem
+17) Leave/cancel/reset
+18) bindUIEvents()
+19) Restore Session + Boot (single entry point)
+
 Data Model (ย่อ)
-
 rooms/{code} มีคีย์หลัก ๆ:
-
-status: lobby | inGame | finished
-
+  status: lobby | inGame | finished
 phase:
-
-idle รอ host เริ่มรอบ
-
-rolling ให้ผู้เล่นทอย
-
-questionCountdown นับถอยหลัง 3 วิ
-
-answering ช่วงตอบคำถาม (จับเวลา)
-
-result เฉลย/สรุปรอบ
-
-ended เกมจบ
-
+  idle รอ host เริ่มรอบ
+  rolling ให้ผู้เล่นทอย
+  questionCountdown นับถอยหลัง 3 วิ
+  answering ช่วงตอบคำถาม (จับเวลา)
+  result เฉลย/สรุปรอบ
+  ended เกมจบ
 currentRound (เริ่มที่ 0)
-
 questionIndex (ผูกกับรอบ)
-
 players/{pid}: name, color, position, hasRolled, answered, answer, finished ฯลฯ
-
 history/round_{n}:
-
-diceMoves/{pid}: from/to/roll/pathCells
-
-answers/{pid}: selectedOption/correct/basePosition/finalPosition/configuredMove ฯลฯ
-
+  diceMoves/{pid}: from/to/roll/pathCells
+  answers/{pid}: selectedOption/correct/basePosition/finalPosition/configuredMove ฯลฯ
 winners[]: ลำดับเข้าเส้นชัย
-
 gameSettings: questionSetId, maxRounds, maxWinners, rewardCorrect, penaltyWrong
-
 ตอนเกมจบ: finalPlayers, finalWinners (snapshot เพื่อให้สรุปคงอยู่แม้ player ออก)
 
 User Roles
 Host
-
-สร้างห้อง + ตั้งค่าเกม
-
-เริ่มเกม (เปลี่ยนจาก lobby -> inGame)
-
-เริ่มรอบใหม่
-
-เริ่มคำถาม (หลังทุกคนทอยแล้ว)
-
-เฉลยคำถาม (คำนวณผลขยับตำแหน่ง/ผู้ชนะ/จบเกม)
-
+  สร้างห้อง + ตั้งค่าเกม
+  เริ่มเกม (เปลี่ยนจาก lobby -> inGame)
+  เริ่มรอบใหม่
+  เริ่มคำถาม (หลังทุกคนทอยแล้ว)
+  เฉลยคำถาม (คำนวณผลขยับตำแหน่ง/ผู้ชนะ/จบเกม)
 Player
-
-Join ห้อง (เฉพาะตอน lobby และยังไม่เริ่มรอบ)
-
-ทอยเต๋า (เฉพาะตอน phase=rolling และยังไม่ finish)
-
-ตอบคำถาม (เฉพาะตอน phase=answering และยังไม่หมดเวลา)
+  Join ห้อง (เฉพาะตอน lobby และยังไม่เริ่มรอบ)
+  ทอยเต๋า (เฉพาะตอน phase=rolling และยังไม่ finish)
+  ตอบคำถาม (เฉพาะตอน phase=answering และยังไม่หมดเวลา)
 
 App Lifecycle / Entry Flow
 Boot
-
 boot()
-
 populateQuestionSetSelect()
-
 attemptRestoreSession()
-
-ถ้าพบ session ใน sessionStorage และห้องยังอยู่ → ตั้ง currentRoomCode/currentRole/currentPlayerId แล้ว
-
-enterLobbyView()
-
-subscribeRoom(roomCode)
-
-lockEntryUIForRole(role)
-
-ถ้า restore ไม่ได้ → showEntryLanding()
+  ถ้าพบ session ใน sessionStorage และห้องยังอยู่ → ตั้ง currentRoomCode/currentRole/currentPlayerId แล้ว
+    enterLobbyView()
+    subscribeRoom(roomCode)
+    lockEntryUIForRole(role)
+  ถ้า restore ไม่ได้ → showEntryLanding()
 
 Entry Navigation
-
 หน้าแรก:
-
-Player กด Join Game → showPlayerEntryPage()
-
-Admin กดปุ่ม Admin → openAdminPwOverlay() → ใส่ PIN ถูก → showAdminEntryPage()
+  Player กด Join Game → showPlayerEntryPage()
+  Admin กดปุ่ม Admin → openAdminPwOverlay() → ใส่ PIN ถูก → showAdminEntryPage()
 
 Room Subscription (หัวใจของการ render)
 
