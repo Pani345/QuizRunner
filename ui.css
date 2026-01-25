@@ -762,6 +762,7 @@
   }
   
   #countdownDisplay{
+    font-size: 20px;
     font-weight: 900;
     color: var(--p-800);
     margin-bottom: 6px;
