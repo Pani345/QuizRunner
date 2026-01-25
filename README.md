@@ -13,7 +13,7 @@ Searching online database
 - ทุก client (host/player) subscribe ห้องเดียวกันด้วย onValue() แล้ว render UI จาก roomData
 - การกระทำสำคัญที่ต้องกันชนกัน (start round / roll / submit / reveal) ใช้ runTransaction() เพื่อความ atomic
 
-## ลำดับ Code
+## ลำดับ Code app.js
 
 1. Imports
 2. Firebase init + global error logs
@@ -30,10 +30,9 @@ Searching online database
 13. Transactions helpers (finalizeRollTransaction/submitAnswerTx/moveCountdownToAnsweringTx)
 14. UI render (updateGameView/updateRoleControls/updateQuestionUI/renderChoices/renderPlayerList/renderBoard/renderEndGameSummary)
 15. Timer (ensureTimer/clearTimer)
-16. Dice overlay state + Dice engine subsystem
-17. Leave/cancel/reset
-18. bindUIEvents()
-19. Restore Session + Boot (single entry point)
+16. Leave/cancel/reset
+17. bindUIEvents()
+18. Restore Session + Boot (single entry point)
 
 ## Data Model (ย่อ)
 
@@ -130,7 +129,7 @@ subscribeRoom(roomCode)
 ### Phase C: Player ทอยเต๋า
 
 - Player กดทอย:
-  1. rollDiceWithOverlay() (สุ่มด้วย secureRandomInt + แอนิเมชัน 3D)
+  1. rollWithOverlay() (สุ่มด้วย secureRandomInt + แอนิเมชัน 3D)
   2. finalizeRollTransaction(roll):
      - update position
      - เขียน history/round_n/diceMoves
