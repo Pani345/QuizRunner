@@ -28,7 +28,7 @@ export const QUESTION_SETS = {
     },
     {
       text: "ถ้าลืมรหัสผ่านบ่อย ควรตั้งรหัสใหม่ว่าอะไร?",
-      choices: { A: "123456", B: "password", C: "ForgetMeNot2025!", D: "ชื่อแมว+วันเกิด+OTP" },
+      choices: { A: "123456", B: "password", C: "ForgetMeNot202!", D: "ชื่อแมว+วันเกิด+OTP" },
       correctOption: "C",
       timeLimit: 30,
     },
@@ -843,7 +843,10 @@ export const QUESTION_SET_NAMES = {
  * @returns {string} The display name
  */
 export function getQuestionSetName(setId) {
-  return QUESTION_SET_NAMES[setId] || setId;
+  if (QUESTION_SET_NAMES[setId]) return QUESTION_SET_NAMES[setId];
+  return String(setId || "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\b\w/g, (m) => m.toUpperCase());
 }
 
 /**
