@@ -974,46 +974,46 @@ async function hostRevealAnswerFlow() {
     for (const [pid, p] of Object.entries(players)) {
       const basePos = clampPos(p.position);
       const alreadyFinished = !!p.finished || basePos >= BOARD_SIZE;
-
+    
       let answered = !!p.answered;
       let ans = p.answer ?? null;
-
+    
+      const missedByRoundFlag = (p.missedAnswerRound === currentRound);
+    
+      const missedByStillDisconnected =
+        (p.connected === false) && (answered === false) && (ans == null);
+    
+      const missedAnswer =
+        (!alreadyFinished) &&
+        (answered === false) &&
+        (ans == null) &&
+        (missedByRoundFlag || missedByStillDisconnected);
+    
       let correct = null;
       let configuredMove = 0;
       let finalPos = basePos;
-
+    
       if (!alreadyFinished) {
-        const isDisconnected = (p.connected === false);
-      
-        // เดิม
-        // correct = answered && ans === q.correctOption;
-        // configuredMove = correct ? rewardCorrect : penaltyWrong;
-      
-        const isCorrect = answered && ans === q.correctOption;
-        const missedAnswer = (!answered) && (ans == null); // ไม่ตอบ (หลุด/หมดเวลา/ไม่กด)
-      
-        if (isCorrect) {
-          correct = true;
-          configuredMove = rewardCorrect;
-        } else if (isDisconnected && missedAnswer) {
-          // ✅ NEW: หลุดและไม่ได้ตอบ → ไม่ลงโทษ (อยู่ที่เดิม)
-          correct = null;        // ไม่ถือว่าผิด (เอาไว้ให้ UI ไปแสดง ⚠️)
-          configuredMove = 0;    // ไม่ขยับ
+        if (missedAnswer) {
+          correct = null;
+          configuredMove = 0;
+          finalPos = basePos;
+    
+          p.position = finalPos;       // ✅ เพิ่ม
+          p.lastAnswerCorrect = null;
         } else {
-          // คนที่ยังอยู่แต่ไม่ตอบ/ตอบผิด → โดน penalty ตามเดิม
-          correct = false;
-          configuredMove = penaltyWrong;
-        }
-      
-        finalPos = clampPos(basePos + configuredMove);
-      
-        p.position = finalPos;
-        p.lastAnswerCorrect = correct;
-      
-        if (finalPos >= BOARD_SIZE) {
-          p.finished = true;
-          p.finishedRound = currentRound;
-          p.finishedBy = "answer";
+          correct = answered && ans === q.correctOption;
+          configuredMove = correct ? rewardCorrect : penaltyWrong;
+          finalPos = clampPos(basePos + configuredMove);
+    
+          p.position = finalPos;
+          p.lastAnswerCorrect = correct;
+    
+          if (finalPos >= BOARD_SIZE) {
+            p.finished = true;
+            p.finishedRound = currentRound;
+            p.finishedBy = "answer";
+          }
         }
       } else {
         answered = false;
@@ -1021,11 +1021,8 @@ async function hostRevealAnswerFlow() {
         correct = null;
         configuredMove = 0;
         finalPos = basePos;
-      }      
-
-      // ✅ NEW: ระบุว่า "ไม่ได้ตอบ" (หลุด/หมดเวลา/ไม่กด) เฉพาะคนที่ยัง active
-      const missedAnswer = (answered === false) && (ans == null) && (!alreadyFinished);
-
+      }
+    
       room.history[roundKey].answers[pid] = {
         playerId: pid,
         playerName: p.name || "",
@@ -1035,7 +1032,7 @@ async function hostRevealAnswerFlow() {
         selectedOption: ans,
         correct,
         answered,
-        missedAnswer, // ✅ ตอนนี้มีตัวแปรแล้ว
+        missedAnswer,
         diceRoll: p.lastRoll ?? null,
         basePosition: basePos,
         finalPosition: finalPos,
@@ -1043,17 +1040,7 @@ async function hostRevealAnswerFlow() {
         actualDelta: finalPos - basePos,
         timestamp: now,
       };
-
-      if (finalPos >= BOARD_SIZE && !winnerIds.has(pid)) {
-        room.winners.push({
-          playerId: pid,
-          playerName: p.name || pid,
-          finishedRound: p.finishedRound ?? currentRound,
-          rank: room.winners.length + 1,
-        });
-        winnerIds.add(pid);
-      }
-
+    
       players[pid] = p;
     }
 
@@ -1179,6 +1166,13 @@ joinRoomBtn?.addEventListener("click", async () => {
 
   // ✅ rejoin: ทำได้เฉพาะตอน started=true และมี existingPid
   if (started && existingPid) {
+    // ✅ ถ้าพบชื่อเดิม แต่เจ้าของชื่อยัง connected อยู่ -> ห้ามแย่ง rejoin
+    const existingPlayer = players?.[existingPid] || null;
+    if (existingPlayer && existingPlayer.connected !== false) {
+      alert("ชื่อนี้กำลังออนไลน์อยู่ในห้องแล้ว กรุณาใช้ชื่อของตนเอง (หรือแจ้งครูหากเป็นชื่อซ้ำ)");
+      return;
+    }
+
     currentRoomCode = roomCode;
     currentRole = "player";
     currentPlayerId = existingPid;
@@ -1550,6 +1544,43 @@ async function moveCountdownToAnsweringTx() {
     room.phase = PHASE.ANSWERING;
     room.answerStartAt = now;
     room.answerDeadlineExpired = false;
+
+    return room;
+  });
+}
+
+async function markAnswerDeadlineExpiredTx() {
+  if (!currentRoomCode) return;
+
+  const roomRef = ref(db, `rooms/${currentRoomCode}`);
+  const now = Date.now();
+
+  await runTransaction(roomRef, (room) => {
+    if (!room) return room;
+    if (room.phase !== PHASE.ANSWERING) return room;
+
+    const round = room.currentRound || 0;
+    if (round <= 0) return room;
+
+    // ✅ กันทำซ้ำ
+    if (room.answerDeadlineExpired === true) return room;
+
+    room.answerDeadlineExpired = true;
+    room.answerDeadlineExpiredAt = now;
+
+    const players = room.players || {};
+    for (const [pid, p] of Object.entries(players)) {
+      const pos = clampPos(p.position);
+      const finished = !!p.finished || pos >= BOARD_SIZE;
+
+      // ✅ เฉพาะคนที่ยังเล่นอยู่ + หลุดตอนหมดเวลา + ยังไม่ตอบ
+      if (!finished && p.connected === false && p.answered !== true) {
+        p.missedAnswerRound = round;  // ✅ ล็อกว่า missed รอบนี้
+        p.missedAnswerAt = now;
+        players[pid] = p;
+      }
+    }
+    room.players = players;
 
     return room;
   });
@@ -1975,7 +2006,11 @@ function renderPlayerList(roomData, playersObj) {
 
   const history = roomData.history || {};
   const currentRound = Number(roomData.currentRound || 0);
-  const roundsToShow = Math.max(0, currentRound); // แสดงตาม currentRound เสมอ
+  const roundsToShow = Math.max(0, currentRound);
+
+  const currRoundData = history[`round_${currentRound}`] || {};
+  const currDiceMoves = currRoundData.diceMoves || {};
+  const currAnswers = currRoundData.answers || {};
 
   // เตรียม perPlayer
   const perPlayer = {};
@@ -1989,48 +2024,41 @@ function renderPlayerList(roomData, playersObj) {
       answered: !!p.answered,
       finished: !!p.finished || pos >= BOARD_SIZE,
       finishRound: Number.isFinite(p.finishedRound) ? Number(p.finishedRound) : null,
-    
       connected: (p.connected !== false),
-    
-      rollsByRound: Array(roundsToShow).fill(null),
-      ansByRound: Array(roundsToShow).fill(null),
-    };    
+
+      rollsByRound: Array(roundsToShow).fill(null), // number | "☐" | null
+      ansByRound: Array(roundsToShow).fill(null),   // "✅"/"❌"/"⚠️"/"➖" | null
+    };
   }
 
-  // helper: เติมผลทอย/ผลคำตอบจาก history ต่อรอบ
+  // เติมผลทอย/ผลคำตอบจาก history ต่อรอบ
   for (let rn = 1; rn <= roundsToShow; rn++) {
     const idx = rn - 1;
     const rd = history[`round_${rn}`] || {};
 
     const diceMoves = rd.diceMoves || {};
     const answers = rd.answers || {};
+    const hasAnswers = rd.answers && Object.keys(rd.answers).length > 0;
 
     for (const [pid, s] of Object.entries(perPlayer)) {
-      // 1) ถ้าเข้าเส้นชัยแล้ว -> รอบถัดไปทั้งหมดเป็น ☐ และ ➖ (รวมถึงรอบปัจจุบันถ้า rn > finishRound)
+      // 1) ถ้าเข้าเส้นชัยแล้ว -> รอบถัดไปทั้งหมดเป็น ☐ และ ➖
       if (s.finishRound != null && rn > s.finishRound) {
-        // ✅ ผลทอย: โชว์ ☐ ทันทีเมื่อเริ่มรอบใหม่
         s.rollsByRound[idx] = "☐";
-
-        // ✅ ผลคำตอบ: โชว์ ➖ เฉพาะเมื่อ host "เฉลยคำถาม" แล้ว (มี answers ใน history)
-        const hasAnswers = rd.answers && Object.keys(rd.answers).length > 0;
         if (hasAnswers) s.ansByRound[idx] = "➖";
-
         continue;
       }
 
-      // 2) ผลทอย: อ่านจาก diceMoves (ขึ้นทันทีหลังทอย)
+      // 2) ผลทอย: อ่านจาก diceMoves
       const dm = diceMoves[pid];
       if (dm && dm.diceRoll != null) {
         s.rollsByRound[idx] = Number(dm.diceRoll);
       }
 
-      // 3) ผลคำตอบ: อ่านจาก answers (ขึ้นหลัง host เฉลย)
+      // 3) ผลคำตอบ: อ่านจาก answers
       const ar = answers[pid];
       if (ar) {
         const basePos = ar.basePosition ?? null;
         const finalPos = ar.finalPosition ?? null;
-
-        // กรณี "เป็นกลาง" (เข้าเส้นชัยด้วย dice) — ไม่ควรให้เป็น ✅/❌
         const neutralFinishByDice =
           ar.correct == null &&
           ar.answered === false &&
@@ -2040,19 +2068,22 @@ function renderPlayerList(roomData, playersObj) {
           finalPos >= BOARD_SIZE;
 
         if (neutralFinishByDice) {
-          // hasAnswers ถูกประกาศไว้ก่อนหน้าแล้วใน loop rn
           if (hasAnswers) s.ansByRound[idx] = "➖";
         } else {
-          // ✅ NEW: ถ้าไม่ได้ตอบเลย (ไม่กด/หมดเวลา/หลุด) ให้ ⚠️
-          const missedAnswer = (ar.answered === false) && (ar.selectedOption == null);
-
-          if (missedAnswer) {
+          // PRIORITY 1: missed (หลุด/กลับมาหลังหมดเวลา) => ⚠️
+          if (ar.missedAnswer === true) {
             s.ansByRound[idx] = "⚠️";
-          } else {
-            s.ansByRound[idx] = ar.correct === true ? "✅" : "❌";
+          }
+          // PRIORITY 2: ไม่ตอบ/หมดเวลา (แต่ไม่ได้ missed) => ❌
+          else if (ar.answered === false && ar.selectedOption == null) {
+            s.ansByRound[idx] = "❌";
+          }
+          // PRIORITY 3: ตอบแล้ว => ✅/❌
+          else {
+            s.ansByRound[idx] = (ar.correct === true) ? "✅" : "❌";
           }
         }
-      }    
+      }
     }
   }
 
@@ -2076,7 +2107,9 @@ function renderPlayerList(roomData, playersObj) {
     return out || "-";
   };
 
-  const list = Object.values(perPlayer).sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+  const list = Object.values(perPlayer).sort((a, b) =>
+    String(a.name || "").localeCompare(String(b.name || ""))
+  );
 
   let html = `
     <table>
@@ -2096,6 +2129,34 @@ function renderPlayerList(roomData, playersObj) {
   `;
 
   list.forEach((s, index) => {
+    // --- สรุปรอบปัจจุบันจาก HISTORY เป็นหลัก ---
+    const dm = currDiceMoves[s.id] || null;
+    const ar = currAnswers[s.id] || null;
+
+    // ทอยเองจริง ๆ = มี diceRoll และไม่ได้ถูก auto-skip (missed=true) และแต้มไม่ใช่ 0
+    const rolledByMeThisRound =
+      !!dm &&
+      dm.diceRoll != null &&
+      dm.missed !== true &&
+      Number(dm.diceRoll) > 0;
+
+    // ตอบแล้วจริง ๆ ในรอบนี้:
+    // - ถ้ามี record ใน history แปลว่า host เฉลยแล้ว -> ใช้ answered/selectedOption ใน record
+    // - ถ้ายังไม่มี record (ยังไม่เฉลย) -> ใช้ state realtime (p.answered)
+    const answeredByMeThisRound =
+      ar
+        ? (ar.answered === true && ar.selectedOption != null)
+        : !!s.answered;
+
+    // --- ไอคอนตาม requirement ---
+    // ถ้าหลุด:
+    // - ยังไม่ทอย -> ⚠️ , ถ้าทอยแล้ว -> 🎲
+    // - ยังไม่ตอบ -> ⚠️ , ถ้าตอบแล้ว -> ✔️
+    // ถ้ายังอยู่:
+    // - ยังไม่ทำ -> "-"
+    const rollIcon = rolledByMeThisRound ? "🎲" : (s.connected ? "-" : "⚠️");
+    const ansIcon  = answeredByMeThisRound ? "✔️" : (s.connected ? "-" : "⚠️");
+
     const rollsText = rollsToText(s.rollsByRound);
     const ansText = ansToText(s.ansByRound);
 
@@ -2104,16 +2165,8 @@ function renderPlayerList(roomData, playersObj) {
         <td>${index + 1}</td>
         <td class="name-col">${escapeHtml(normalizeName(s.name))}</td>
         <td>${s.position}</td>
-        <td>${
-          s.hasRolled
-            ? "🎲"
-            : (s.connected ? "-" : "⚠️")
-        }</td>
-        <td>${
-          s.answered
-            ? "✔️"
-            : (s.connected ? "-" : "⚠️")
-        }</td>
+        <td>${rollIcon}</td>
+        <td>${ansIcon}</td>
         <td class="rolls-col"><span class="rolls-text">${escapeHtml(rollsText)}</span></td>
         <td>${ansText}</td>
         <td>${s.finished ? "🏁 เข้าเส้นชัย" : "-"}</td>
@@ -2312,61 +2365,104 @@ function renderEndGameSummary(roomData, players) {
     .filter((k) => k.startsWith("round_"))
     .sort((a, b) => parseInt(a.split("_")[1] || "0", 10) - parseInt(b.split("_")[1] || "0", 10));
 
-  for (const rk of roundKeys) {
-    const roundData = history[rk] || {};
-    const answers = roundData.answers || {};
-
-    for (const [pid, rec] of Object.entries(answers)) {
-      if (!perPlayer[pid]) {
-        perPlayer[pid] = {
-          id: pid,
-          name: rec.playerName || pid,
-          finalPosition: players?.[pid]?.position ?? 1,
-          finished: !!players?.[pid]?.finished || (players?.[pid]?.position ?? 1) >= BOARD_SIZE,
-          finishRound: players?.[pid]?.finishedRound ?? null,
-          finishBy: players?.[pid]?.finishedBy ?? null,
-          correct: 0,
-          wrong: 0,
-          timeout: 0,
-          rolls: [],
-          answerSymbols: [],
-          pctCorrect: 0,
-          rank: null,
-        };
-      }
-
-      const s = perPlayer[pid];
-
-      if (rec.diceRoll != null) s.rolls.push(rec.diceRoll);
-
-      const basePos = rec.basePosition ?? null;
-      const finalPos = rec.finalPosition ?? null;
-      const neutralFinishByDice =
-        rec.correct == null &&
-        rec.answered === false &&
-        Number.isFinite(basePos) &&
-        Number.isFinite(finalPos) &&
-        basePos >= BOARD_SIZE &&
-        finalPos >= BOARD_SIZE;
-
-      if (!neutralFinishByDice) {
-        if (rec.correct === true) {
-          s.correct += 1;
-          s.answerSymbols.push("✅");
-        } else {
-          if (rec.answered) s.wrong += 1;
-          else s.timeout += 1;
-          s.answerSymbols.push("❌");
+    for (const rk of roundKeys) {
+      const roundData = history[rk] || {};
+      const diceMoves = roundData.diceMoves || {};
+      const answers = roundData.answers || {};
+      const rn = parseInt(rk.split("_")[1] || "0", 10);
+    
+      // 1) ✅ อัปเดตจาก "ทอยเต๋า" ก่อน (สำคัญมากสำหรับจบด้วย dice)
+      for (const [pid, dm] of Object.entries(diceMoves)) {
+        if (!perPlayer[pid]) {
+          perPlayer[pid] = {
+            id: pid,
+            name: dm.playerName || players?.[pid]?.name || pid,
+            finalPosition: players?.[pid]?.position ?? 1,
+            finished: !!players?.[pid]?.finished || (players?.[pid]?.position ?? 1) >= BOARD_SIZE,
+            finishRound: players?.[pid]?.finishedRound ?? null,
+            finishBy: players?.[pid]?.finishedBy ?? null,
+            correct: 0,
+            wrong: 0,
+            timeout: 0,
+            rolls: [],
+            answerSymbols: [],
+            pctCorrect: 0,
+            rank: null,
+          };
+        }
+    
+        const s = perPlayer[pid];
+    
+        // เก็บผลทอย
+        if (dm.diceRoll != null) s.rolls.push(Number(dm.diceRoll));
+    
+        // ✅ อัปเดตตำแหน่งจากการทอย (ใช้ toPosition)
+        const toPos = dm.toPosition;
+        if (Number.isFinite(toPos)) s.finalPosition = toPos;
+    
+        // ✅ ถ้าทอยถึงเส้นชัย ให้ mark การจบด้วย dice
+        if (Number.isFinite(toPos) && toPos >= BOARD_SIZE && s.finishRound == null) {
+          s.finishRound = rn;
+          s.finishBy = "dice";
+          s.finished = true;
         }
       }
-
-      if (Number.isFinite(finalPos)) s.finalPosition = finalPos;
-      if (finalPos >= BOARD_SIZE && s.finishRound == null) {
-        const rn = parseInt(rk.split("_")[1] || "0", 10);
-        s.finishRound = rn;
+    
+      // 2) อัปเดตจาก "เฉลยคำตอบ" ทีหลัง (ถ้ามี answers)
+      for (const [pid, rec] of Object.entries(answers)) {
+        if (!perPlayer[pid]) {
+          perPlayer[pid] = {
+            id: pid,
+            name: rec.playerName || pid,
+            finalPosition: players?.[pid]?.position ?? 1,
+            finished: !!players?.[pid]?.finished || (players?.[pid]?.position ?? 1) >= BOARD_SIZE,
+            finishRound: players?.[pid]?.finishedRound ?? null,
+            finishBy: players?.[pid]?.finishedBy ?? null,
+            correct: 0,
+            wrong: 0,
+            timeout: 0,
+            rolls: [],
+            answerSymbols: [],
+            pctCorrect: 0,
+            rank: null,
+          };
+        }
+    
+        const s = perPlayer[pid];
+    
+        const basePos = rec.basePosition ?? null;
+        const finalPos = rec.finalPosition ?? null;
+        const neutralFinishByDice =
+          rec.correct == null &&
+          rec.answered === false &&
+          Number.isFinite(basePos) &&
+          Number.isFinite(finalPos) &&
+          basePos >= BOARD_SIZE &&
+          finalPos >= BOARD_SIZE;
+    
+        if (!neutralFinishByDice) {
+          if (rec.correct === true) {
+            s.correct += 1;
+            s.answerSymbols.push("✅");
+          } else {
+            if (rec.missedAnswer === true) s.answerSymbols.push("⚠️");
+            else s.answerSymbols.push("❌");
+    
+            if (rec.answered) s.wrong += 1;
+            else s.timeout += 1;
+          }
+        }
+    
+        // ✅ ตำแหน่งหลังเฉลย (ทับค่าจาก diceMoves ได้ถ้ารอบนั้นมีคำถาม)
+        if (Number.isFinite(finalPos)) s.finalPosition = finalPos;
+    
+        if (Number.isFinite(finalPos) && finalPos >= BOARD_SIZE && s.finishRound == null) {
+          s.finishRound = rn;
+          s.finishBy = "answer";
+          s.finished = true;
+        }
       }
-    }
-  }
+    }    
 
   for (const s of Object.values(perPlayer)) {
     const totalQ = s.correct + s.wrong + s.timeout;
@@ -2439,7 +2535,6 @@ function renderEndGameSummary(roomData, players) {
       if (ar) {
         const basePos = ar.basePosition ?? null;
         const finalPos = ar.finalPosition ?? null;
-
         const neutralFinishByDice =
           ar.correct == null &&
           ar.answered === false &&
@@ -2448,19 +2543,15 @@ function renderEndGameSummary(roomData, players) {
           basePos >= BOARD_SIZE &&
           finalPos >= BOARD_SIZE;
 
-        if (!neutralFinishByDice) {
-          // ✅ NEW: ถ้าไม่ได้ตอบเลย (หมดเวลา/หลุด) ให้แสดง ⚠️
-          const missedAnswer = (ar.answered === false) && (ar.selectedOption == null);
-
-          if (missedAnswer) {
-            rr.ansByRound[idx] = "⚠️";
-          } else {
-            rr.ansByRound[idx] = (ar.correct === true) ? "✅" : "❌";
-          }
-        } else {
-          // กรณีเป็นกลาง (เข้าเส้นชัยด้วย dice ก่อนเฉลย) — ถ้ามีเฉลยแล้วค่อยโชว์ ➖
-          if (hasAnswers) rr.ansByRound[idx] = "➖";
-        }
+          if (!neutralFinishByDice) {
+            if (ar.missedAnswer === true) {
+              rr.ansByRound[idx] = "⚠️";
+            } else if (ar.answered === false && ar.selectedOption == null) {
+              rr.ansByRound[idx] = "❌";
+            } else {
+              rr.ansByRound[idx] = (ar.correct === true) ? "✅" : "❌";
+            }
+          }          
       }
 
       // ✅ FIX: เข้าเส้นชัยด้วย "ทอยถึง" ในรอบเดียวกัน + มีการเฉลย (answers เกิดแล้ว)
@@ -2680,18 +2771,16 @@ function ensureTimer(roomData, targetPhase) {
       let remaining = Math.ceil((start + duration * 1000 - now) / 1000);
       if (remaining < 0) remaining = 0;
 
-      if (countdownDisplayEl) countdownDisplayEl.textContent = `เหลือเวลา ${remaining} วินาที`;
+      if (countdownDisplayEl) countdownDisplayEl.textContent = `⏱ เหลือเวลา ${remaining} วินาที`;
 
       if (remaining <= 0) {
         clearTimer();
-
-        if (currentRole === "host" && currentRoomCode && roomData.answerDeadlineExpired !== true) {
-          const roomRef = ref(db, `rooms/${currentRoomCode}`);
-          update(roomRef, { answerDeadlineExpired: true }).catch((e) =>
-            console.error("Error setting answerDeadlineExpired:", e)
-          );
+      
+        // ✅ ใช้ transaction เพื่อ set expired + mark missedAnswerRound ให้คนที่หลุด
+        if (currentRole === "host" && currentRoomCode) {
+          markAnswerDeadlineExpiredTx().catch((e) => console.error(e));
         }
-      }
+      }      
     }, 250);
   }
 }
