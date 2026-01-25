@@ -158,5 +158,3 @@ ________________________________________
   •	Player: roll overlay → finalizeRollTransaction() (tx) → submitAnswerTx() (tx)
   •	Timer: ensureTimer() → moveCountdownToAnsweringTx() (tx)
 
-<img width="468" height="655" alt="image" src="https://github.com/user-attachments/assets/cbef4e1d-650d-4ed5-ac52-f20def0eb22f" />
-
